@@ -1,0 +1,16 @@
+# Secrets - never commit these files to version control
+.env
+
+# Virtual environment
+.venv/
+
+# Python compiled files
+__pycache__/
+*.pyc
+
+# Type checker cache
+.mypy_cache/
+
+# Editor settings
+.idea/
+.vscode/
