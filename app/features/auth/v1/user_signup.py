@@ -5,7 +5,7 @@ from app.db_functions.auth import get_user_by_email
 
 
 async def authenticate_user(email: str, password: str) -> dict | None:
-    print("vjebvbsubvusbgvrui")
+
     user = await get_user_by_email(email)
     if not user:
         return None
