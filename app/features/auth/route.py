@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import create_access_token
+from app.dependencies.auth import get_current_user, require_role
 from app.schemas.user_signup import UserLogin
 
 from .v1.signup_bundle import login_api
@@ -30,3 +31,15 @@ async def login(login_data: UserLogin):
         "token_type": "bearer",
         "role": user["role"],
     }
+
+
+# Any logged-in user, whatever their role — proves authentication works.
+@router.get("/me")
+async def me(current_user: dict = Depends(get_current_user)):
+    return current_user
+
+
+# Admins only — proves authorization works on top of authentication.
+@router.get("/admin-only")
+async def admin_only(current_user: dict = Depends(require_role("admin"))):
+    return {"message": f"Hello admin {current_user['full_name']}"}
