@@ -1,4 +1,4 @@
-#This library helps us to handle token errors later in the code in this module
+# This library helps us to handle token errors later in the code in this module
 import jwt
 from bson import ObjectId
 from app.core.database import get_database
@@ -8,6 +8,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.core.security import decode_access_token
 
 bearer_scheme = HTTPBearer()
+
+
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> dict:
@@ -23,7 +25,7 @@ async def get_current_user(
         )
     user = await get_database().users.find_one(
         {"_id": ObjectId(payload["sub"])},
-        #we don't want to return the password hash to the user, so we exclude it from the returned document
+        # we don't want to return the password hash to the user, so we exclude it from the returned document
         {"password_hash": 0},
     )
 
@@ -45,6 +47,6 @@ def require_role(*allowed_roles: str):
                 detail="You do not have permission to access this resource",
             )
         return user
-#a function that creates and returns new objects, typically instances of a class
-    return role_checker
 
+    # a function that creates and returns new objects, typically instances of a class
+    return role_checker
