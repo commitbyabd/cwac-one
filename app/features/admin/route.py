@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.dependencies.auth import require_role
 
-from .v1.admin_dashboard import doctor_list_api, get_one_doctor_api
+from .v1.admin_dashboard import (
+    doctor_list_api,
+    get_one_doctor_api,
+    deactivate_doctor_api,
+)
 
 router = APIRouter(prefix="/admin", tags=["admin-dashboard"])
 
@@ -23,3 +27,16 @@ async def one_doctor(doctor_id: str, _: dict = Depends(require_role("admin"))):
         )
 
     return doctor
+
+
+@router.patch("/doctors/{doctor_id}/deactivate")
+async def deactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admin"))):
+    deactivated = await deactivate_doctor_api(doctor_id)
+
+    if not deactivated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Doctor not found",
+        )
+
+    return {"message": "Doctor deactivated successfully"}

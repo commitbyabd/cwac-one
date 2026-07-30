@@ -43,4 +43,23 @@ async def get_doctor_by_id(doctor_id: str) -> dict | None:
     return doctor
 
 
+# DE-Activate the specific doctor by using the following query
+# ------------------------------------------------------------------------
+
+
+async def set_activation_state(doctor_id: str, is_active: bool) -> bool:
+    try:
+        object_id = ObjectId(doctor_id)
+    except InvalidId:
+        return False  # malformed id, treat the same as "not found"
+
+    result = await get_database().users.update_one(
+        {"_id": object_id, "role": "doctor"},  # role guard: admins are untouchable
+        {"$set": {"is_active": is_active}},
+    )
+
+    return result.matched_count == 1
+
+
+#
 # ------------------------------------------------------------------------

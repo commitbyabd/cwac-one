@@ -3,6 +3,7 @@
 
 from .doctor_list import doctor_list
 from .get_one_doctor import one_doctor_by_id
+from .deactivate_doctor import deactivate_doctor
 
 
 async def doctor_list_api():
@@ -11,3 +12,7 @@ async def doctor_list_api():
 
 async def get_one_doctor_api(doctor_id: str):
     return await one_doctor_by_id(doctor_id)
+
+
+async def deactivate_doctor_api(doctor_id: str):
+    return await deactivate_doctor(doctor_id)
