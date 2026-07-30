@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import connect_to_mongo, close_mongo_connection
 from app.routers.auth import router as auth_router
+from app.routers.admin import router as admin_router
 
 
 @asynccontextmanager
@@ -31,3 +32,4 @@ async def read_root():
 
 
 app.include_router(auth_router)
+app.include_router(admin_router)
