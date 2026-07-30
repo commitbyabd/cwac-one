@@ -4,6 +4,9 @@
 from .doctor_list import doctor_list
 from .get_one_doctor import one_doctor_by_id
 from .deactivate_doctor import deactivate_doctor
+from .receptionist_list import receptionist_list
+from .get_one_receptionist import one_receptionist_by_id
+from .deactivate_receptionist import deactivate_receptionist
 
 
 async def doctor_list_api():
@@ -16,3 +19,15 @@ async def get_one_doctor_api(doctor_id: str):
 
 async def deactivate_doctor_api(doctor_id: str):
     return await deactivate_doctor(doctor_id)
+
+
+async def receptionist_list_api():
+    return await receptionist_list()
+
+
+async def get_one_receptionist_api(receptionist_id: str):
+    return await one_receptionist_by_id(receptionist_id)
+
+
+async def deactivate_receptionist_api(receptionist_id: str):
+    return await deactivate_receptionist(receptionist_id)

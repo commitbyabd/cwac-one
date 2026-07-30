@@ -47,7 +47,7 @@ async def get_doctor_by_id(doctor_id: str) -> dict | None:
 # ------------------------------------------------------------------------
 
 
-async def set_activation_state(doctor_id: str, is_active: bool) -> bool:
+async def set_doctor_activation_state(doctor_id: str, is_active: bool) -> bool:
     try:
         object_id = ObjectId(doctor_id)
     except InvalidId:
@@ -61,5 +61,64 @@ async def set_activation_state(doctor_id: str, is_active: bool) -> bool:
     return result.matched_count == 1
 
 
-#
+# GET Receptionist list from the following database Query
 # ------------------------------------------------------------------------
+
+
+async def list_receptionists() -> list[dict]:
+    cursor = get_database().users.find(
+        {"role": "receptionist", "is_active": True},
+        {"_id": 1, "full_name": 1, "email": 1},
+    )
+    receptionists = await cursor.to_list(
+        length=None
+    )  # means no matter the length get me eveything
+
+    # ObjectId is a pymongo type, JSON has no equivalent, so it never leaves this layer
+    for receptionist in receptionists:
+        receptionist["id"] = str(receptionist.pop("_id"))
+
+    return receptionists
+
+
+# GET Receptionist id (one specific receptionist) from the following database query
+# ------------------------------------------------------------------------
+async def get_receptionist_by_id(receptionist_id: str) -> dict | None:
+    try:
+        object_id = ObjectId(receptionist_id)
+    except InvalidId:
+        return None  # malformed id, treat the same as "not found"
+
+    receptionist = await get_database().users.find_one(
+        {"_id": object_id, "role": "receptionist"},
+        {"_id": 1, "full_name": 1, "email": 1},
+    )
+    # this if statement was added is the id is valid but no doc exists agaisnt that id
+    if receptionist is None:
+        return None
+
+    receptionist["id"] = str(receptionist.pop("_id"))
+    return receptionist
+
+
+# DE-Activate the specific receptionist by using the following query
+# ------------------------------------------------------------------------
+
+
+async def set_receptionist_activation_state(
+    receptionist_id: str, is_active: bool
+) -> bool:
+    try:
+        object_id = ObjectId(receptionist_id)
+    except InvalidId:
+        return False  # malformed id, treat the same as "not found"
+
+    result = await get_database().users.update_one(
+        {
+            "_id": object_id,
+            "role": "receptionist",
+        },  # role guard: admins are untouchable
+        {"$set": {"is_active": is_active}},
+    )
+
+    return result.matched_count == 1
