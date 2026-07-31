@@ -35,6 +35,27 @@ async def list_doctors() -> list[dict]:
     return doctors
 
 
+# Edit a user from the following database query
+# -----------------------------------------------------------------------
+
+
+async def edit_user(user_id: str, role: str, fields: dict) -> bool:
+    if not fields:
+        return False
+
+    try:
+        object_id = ObjectId(user_id)
+    except InvalidId:
+        return False
+
+    result = await get_database().users.update_one(
+        {"_id": object_id, "role": role},
+        {"$set": fields},
+    )
+
+    return result.matched_count == 1
+
+
 # GET Doctor id (one specific doctor) from the following database query
 # ------------------------------------------------------------------------
 async def get_doctor_by_id(doctor_id: str) -> dict | None:
