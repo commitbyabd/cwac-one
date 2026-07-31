@@ -12,8 +12,10 @@ from .v1.admin_dashboard import (
     reactivate_receptionist_api,
     reactivate_doctor_api,
     add_doctor_api,
+    add_receptionist_api,
 )
 from app.schemas.doctor_create import DoctorCreate
+from app.schemas.receptionist_create import ReceptionistCreate
 
 router = APIRouter(prefix="/admin", tags=["admin-dashboard"])
 
@@ -105,7 +107,7 @@ async def one_receptionist(
     return receptionist
 
 
-@router.patch("/receptionists/{receptionist_id}/reactivate")
+@router.patch("/receptionists/{receptionist_id}/deactivate")
 async def deactivate_receptionist(
     receptionist_id: str, _: dict = Depends(require_role("admin"))
 ):
@@ -120,7 +122,7 @@ async def deactivate_receptionist(
     return {"message": "Receptionist deactivated successfully"}
 
 
-@router.patch("/receptionists/{receptionist_id}/deactivate")
+@router.patch("/receptionists/{receptionist_id}/reactivate")
 async def reactivate_receptionist(
     receptionist_id: str, _: dict = Depends(require_role("admin"))
 ):
@@ -133,3 +135,22 @@ async def reactivate_receptionist(
         )
 
     return {"message": "Receptionist activated successfully"}
+
+
+@router.post("/receptionists", status_code=status.HTTP_201_CREATED)
+async def add_receptionist(
+    receptionist: ReceptionistCreate, _: dict = Depends(require_role("admin"))
+):
+    receptionist_id = await add_receptionist_api(
+        receptionist.full_name,
+        receptionist.email,
+        receptionist.password.get_secret_value(),
+    )
+
+    if receptionist_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email already exists",
+        )
+
+    return {"id": receptionist_id, "message": "Receptionist created successfully"}

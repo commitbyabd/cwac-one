@@ -10,6 +10,7 @@ from .deactivate_receptionist import deactivate_receptionist
 from .reactivate_doctor import reactivate_doctor
 from .reactivate_receptionist import reactivate_receptionist
 from .add_doctor import create_doctor
+from .add_receptionist import create_receptionist
 
 
 async def doctor_list_api():
@@ -48,3 +49,7 @@ async def add_doctor_api(
     full_name: str, email: str, password: str, specialization: str
 ) -> str | None:
     return await create_doctor(full_name, email, password, specialization)
+
+
+async def add_receptionist_api(full_name: str, email: str, password: str) -> str | None:
+    return await create_receptionist(full_name, email, password)
