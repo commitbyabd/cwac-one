@@ -7,6 +7,8 @@ from .deactivate_doctor import deactivate_doctor
 from .receptionist_list import receptionist_list
 from .get_one_receptionist import one_receptionist_by_id
 from .deactivate_receptionist import deactivate_receptionist
+from .reactivate_doctor import reactivate_doctor
+from .reactivate_receptionist import reactivate_receptionist
 
 
 async def doctor_list_api():
@@ -31,3 +33,11 @@ async def get_one_receptionist_api(receptionist_id: str):
 
 async def deactivate_receptionist_api(receptionist_id: str):
     return await deactivate_receptionist(receptionist_id)
+
+
+async def reactivate_doctor_api(doctor_id: str):
+    return await reactivate_doctor(doctor_id)
+
+
+async def reactivate_receptionist_api(receptionist_id: str):
+    return await reactivate_receptionist(receptionist_id)

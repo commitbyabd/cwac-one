@@ -9,6 +9,8 @@ from .v1.admin_dashboard import (
     receptionist_list_api,
     get_one_receptionist_api,
     deactivate_receptionist_api,
+    reactivate_receptionist_api,
+    reactivate_doctor_api,
 )
 
 router = APIRouter(prefix="/admin", tags=["admin-dashboard"])
@@ -45,6 +47,19 @@ async def deactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admi
     return {"message": "Doctor deactivated successfully"}
 
 
+@router.patch("/doctors/{doctor_id}/reactivate")
+async def reactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admin"))):
+    reactivated = await reactivate_doctor_api(doctor_id)
+
+    if not reactivated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Doctor not found",
+        )
+
+    return {"message": "Doctor reactivated successfully"}
+
+
 # -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------
@@ -70,7 +85,7 @@ async def one_receptionist(
     return receptionist
 
 
-@router.patch("/receptionists/{receptionist_id}/deactivate")
+@router.patch("/receptionists/{receptionist_id}/reactivate")
 async def deactivate_receptionist(
     receptionist_id: str, _: dict = Depends(require_role("admin"))
 ):
@@ -83,3 +98,18 @@ async def deactivate_receptionist(
         )
 
     return {"message": "Receptionist deactivated successfully"}
+
+
+@router.patch("/receptionists/{receptionist_id}/deactivate")
+async def reactivate_receptionist(
+    receptionist_id: str, _: dict = Depends(require_role("admin"))
+):
+    reactivated = await reactivate_receptionist_api(receptionist_id)
+
+    if not reactivated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Receptionist not found",
+        )
+
+    return {"message": "Receptionist activated successfully"}

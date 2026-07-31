@@ -43,7 +43,7 @@ async def get_doctor_by_id(doctor_id: str) -> dict | None:
     return doctor
 
 
-# DE-Activate the specific doctor by using the following query
+# $set activation state of the specific doctor by using the following query
 # ------------------------------------------------------------------------
 
 
@@ -101,7 +101,7 @@ async def get_receptionist_by_id(receptionist_id: str) -> dict | None:
     return receptionist
 
 
-# DE-Activate the specific receptionist by using the following query
+# $set activation state of the specific receptionist by using the following query
 # ------------------------------------------------------------------------
 
 
