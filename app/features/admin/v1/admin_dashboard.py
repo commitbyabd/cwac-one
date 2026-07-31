@@ -11,6 +11,8 @@ from .reactivate_doctor import reactivate_doctor
 from .reactivate_receptionist import reactivate_receptionist
 from .add_doctor import create_doctor
 from .add_receptionist import create_receptionist
+from .edit_doctor import update_doctor
+from .edit_receptionist import update_receptionist
 
 
 async def doctor_list_api():
@@ -53,3 +55,20 @@ async def add_doctor_api(
 
 async def add_receptionist_api(full_name: str, email: str, password: str) -> str | None:
     return await create_receptionist(full_name, email, password)
+
+
+async def edit_doctor_api(
+    doctor_id: str,
+    full_name: str | None = None,
+    email: str | None = None,
+    specialization: str | None = None,
+) -> bool:
+    return await update_doctor(doctor_id, full_name, email, specialization)
+
+
+async def edit_receptionist_api(
+    receptionist_id: str,
+    full_name: str | None = None,
+    email: str | None = None,
+) -> bool:
+    return await update_receptionist(receptionist_id, full_name, email)

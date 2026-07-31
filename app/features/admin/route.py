@@ -13,9 +13,14 @@ from .v1.admin_dashboard import (
     reactivate_doctor_api,
     add_doctor_api,
     add_receptionist_api,
+    edit_doctor_api,
+    edit_receptionist_api,
 )
+from app.core.exceptions import EmailAlreadyExists
 from app.schemas.doctor_create import DoctorCreate
+from app.schemas.doctor_update import DoctorUpdate
 from app.schemas.receptionist_create import ReceptionistCreate
+from app.schemas.receptionist_update import ReceptionistUpdate
 
 router = APIRouter(prefix="/admin", tags=["admin-dashboard"])
 
@@ -80,6 +85,40 @@ async def add_doctor(doctor: DoctorCreate, _: dict = Depends(require_role("admin
         )
 
     return {"id": doctor_id, "message": "Doctor created successfully"}
+
+
+@router.patch("/doctors/{doctor_id}")
+async def edit_doctor(
+    doctor_id: str,
+    doctor: DoctorUpdate,
+    _: dict = Depends(require_role("admin")),
+):
+    if not doctor.model_dump(exclude_unset=True):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields provided to update",
+        )
+
+    try:
+        updated = await edit_doctor_api(
+            doctor_id,
+            doctor.full_name,
+            doctor.email,
+            doctor.specialization,
+        )
+    except EmailAlreadyExists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email already exists",
+        )
+
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Doctor not found",
+        )
+
+    return {"message": "Doctor updated successfully"}
 
 
 # -------------------------------------------------------------------------------------
@@ -154,3 +193,36 @@ async def add_receptionist(
         )
 
     return {"id": receptionist_id, "message": "Receptionist created successfully"}
+
+
+@router.patch("/receptionists/{receptionist_id}")
+async def edit_receptionist(
+    receptionist_id: str,
+    receptionist: ReceptionistUpdate,
+    _: dict = Depends(require_role("admin")),
+):
+    if not receptionist.model_dump(exclude_unset=True):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields provided to update",
+        )
+
+    try:
+        updated = await edit_receptionist_api(
+            receptionist_id,
+            receptionist.full_name,
+            receptionist.email,
+        )
+    except EmailAlreadyExists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email already exists",
+        )
+
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Receptionist not found",
+        )
+
+    return {"message": "Receptionist updated successfully"}
