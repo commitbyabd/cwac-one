@@ -3,6 +3,18 @@ from app.core.database import get_database
 from bson import ObjectId
 from bson.errors import InvalidId
 
+# ADD Doctors from the following database Query
+# -----------------------------------------------------------------------
+
+# INSERT a new staff user with the following database query
+# ------------------------------------------------------------------------
+
+
+async def create_user(user_document: dict) -> str:
+    result = await get_database().users.insert_one(user_document)
+    return str(result.inserted_id)
+
+
 # GET Doctors list from the following database Query
 # -----------------------------------------------------------------------
 

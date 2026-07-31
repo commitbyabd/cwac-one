@@ -11,7 +11,9 @@ from .v1.admin_dashboard import (
     deactivate_receptionist_api,
     reactivate_receptionist_api,
     reactivate_doctor_api,
+    add_doctor_api,
 )
+from app.schemas.doctor_create import DoctorCreate
 
 router = APIRouter(prefix="/admin", tags=["admin-dashboard"])
 
@@ -58,6 +60,24 @@ async def reactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admi
         )
 
     return {"message": "Doctor reactivated successfully"}
+
+
+@router.post("/doctors", status_code=status.HTTP_201_CREATED)
+async def add_doctor(doctor: DoctorCreate, _: dict = Depends(require_role("admin"))):
+    doctor_id = await add_doctor_api(
+        doctor.full_name,
+        doctor.email,
+        doctor.password.get_secret_value(),
+        doctor.specialization,
+    )
+
+    if doctor_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email already exists",
+        )
+
+    return {"id": doctor_id, "message": "Doctor created successfully"}
 
 
 # -------------------------------------------------------------------------------------
