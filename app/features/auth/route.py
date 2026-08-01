@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, status
 from app.core.security import create_access_token
 from app.schemas.user_signup import UserLogin
 
-from .v1.signup_bundle import login_api
+from .v1.signup import login_api
 
 # tags is used to group this route in authentication in swagger ui documentation
 router = APIRouter(prefix="/auth", tags=["auth"])
