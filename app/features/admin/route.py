@@ -69,22 +69,14 @@ async def reactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admi
     return {"message": "Doctor reactivated successfully"}
 
 
-@router.post("/doctors", status_code=status.HTTP_201_CREATED)
+@router.post("/doctors")
 async def add_doctor(doctor: DoctorCreate, _: dict = Depends(require_role("admin"))):
-    doctor_id = await add_doctor_api(
+    return await add_doctor_api(
         doctor.full_name,
         doctor.email,
         doctor.password.get_secret_value(),
         doctor.specialization,
     )
-
-    if doctor_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email already exists",
-        )
-
-    return {"id": doctor_id, "message": "Doctor created successfully"}
 
 
 @router.patch("/doctors/{doctor_id}")
@@ -176,23 +168,15 @@ async def reactivate_receptionist(
     return {"message": "Receptionist activated successfully"}
 
 
-@router.post("/receptionists", status_code=status.HTTP_201_CREATED)
+@router.post("/receptionists")
 async def add_receptionist(
     receptionist: ReceptionistCreate, _: dict = Depends(require_role("admin"))
 ):
-    receptionist_id = await add_receptionist_api(
+    return await add_receptionist_api(
         receptionist.full_name,
         receptionist.email,
         receptionist.password.get_secret_value(),
     )
-
-    if receptionist_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email already exists",
-        )
-
-    return {"id": receptionist_id, "message": "Receptionist created successfully"}
 
 
 @router.patch("/receptionists/{receptionist_id}")

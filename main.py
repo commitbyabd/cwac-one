@@ -1,3 +1,4 @@
+from logging_config import setup_logging
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +14,8 @@ async def lifespan(app: FastAPI):
     yield  # app runs here, serving requests
     await close_mongo_connection()  # runs once, at shutdown
 
+
+setup_logging()
 
 app = FastAPI(lifespan=lifespan)
 

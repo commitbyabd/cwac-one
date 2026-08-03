@@ -1,21 +1,48 @@
+from app.core.database import get_database
+from app.core.response import api_response
 from app.core.security import hash_password
-from app.db_functions.admin import create_user
 from app.db_functions.auth import get_user_by_email
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-async def create_doctor(
-    full_name: str, email: str, password: str, specialization: str
-) -> str | None:
-    if await get_user_by_email(email):
-        return None
+async def create_doctor(full_name: str, email: str, password: str, specialization: str):
+    try:
+        if await get_user_by_email(email):
+            return api_response(
+                status_code=409,
+                success=False,
+                message="A user with this email already exists",
+                error_code="EMAIL_TAKEN",
+                data=None,
+            )
 
-    document = {
-        "full_name": full_name,
-        "email": email.lower(),
-        "password_hash": hash_password(password),
-        "specialization": specialization,
-        "role": "doctor",
-        "is_active": True,
-    }
+        document = {
+            "full_name": full_name,
+            "email": email.lower(),
+            "password_hash": hash_password(password),
+            "specialization": specialization,
+            "role": "doctor",
+            "is_active": True,
+        }
 
-    return await create_user(document)
+        result = await get_database().users.insert_one(document)
+
+        return api_response(
+            status_code=201,
+            success=True,
+            message="Doctor created successfully",
+            data={"id": str(result.inserted_id)},
+        )
+
+    except Exception:
+        logger.exception("Error in create_doctor")
+
+        return api_response(
+            status_code=500,
+            success=False,
+            message="Could not create the doctor",
+            error_code="DOCTOR_CREATE_FAILED",
+            data=None,
+        )

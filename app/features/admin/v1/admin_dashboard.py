@@ -49,11 +49,11 @@ async def reactivate_receptionist_api(receptionist_id: str):
 
 async def add_doctor_api(
     full_name: str, email: str, password: str, specialization: str
-) -> str | None:
+):
     return await create_doctor(full_name, email, password, specialization)
 
 
-async def add_receptionist_api(full_name: str, email: str, password: str) -> str | None:
+async def add_receptionist_api(full_name: str, email: str, password: str):
     return await create_receptionist(full_name, email, password)
 
 

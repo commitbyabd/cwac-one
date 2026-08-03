@@ -10,29 +10,29 @@ from bson.errors import InvalidId
 # ------------------------------------------------------------------------
 
 
-async def create_user(user_document: dict) -> str:
-    result = await get_database().users.insert_one(user_document)
-    return str(result.inserted_id)
+# async def create_user(user_document: dict) -> str:
+#     result = await get_database().users.insert_one(user_document)
+#     return str(result.inserted_id)
 
 
 # GET Doctors list from the following database Query
 # -----------------------------------------------------------------------
 
 
-async def list_doctors() -> list[dict]:
-    cursor = get_database().users.find(
-        {"role": "doctor", "is_active": True},
-        {"_id": 1, "full_name": 1, "email": 1, "specialization": 1},
-    )
-    doctors = await cursor.to_list(
-        length=None
-    )  # means no matter the length get me eveything
+# async def list_doctors() -> list[dict]:
+#     cursor = get_database().users.find(
+#         {"role": "doctor", "is_active": True},
+#         {"_id": 1, "full_name": 1, "email": 1, "specialization": 1},
+#     )
+#     doctors = await cursor.to_list(
+#         length=None
+#     )  # means no matter the length get me eveything
 
-    # ObjectId is a pymongo type, JSON has no equivalent, so it never leaves this layer
-    for doctor in doctors:
-        doctor["id"] = str(doctor.pop("_id"))
+#     # ObjectId is a pymongo type, JSON has no equivalent, so it never leaves this layer
+#     for doctor in doctors:
+#         doctor["id"] = str(doctor.pop("_id"))
 
-    return doctors
+#     return doctors
 
 
 # Edit a user from the following database query

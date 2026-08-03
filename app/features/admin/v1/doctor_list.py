@@ -1,9 +1,12 @@
 from app.core.response import api_response
 from app.core.database import get_database
 from app.utils.object_serializer import serialize_documents
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-async def get_doctor_list(doctors: list[dict]):
+async def doctor_list():
     try:
         cursor = get_database().users.find(
             {"role": "doctor", "is_active": True},
@@ -11,18 +14,21 @@ async def get_doctor_list(doctors: list[dict]):
         )
         doctors = await cursor.to_list(length=None)
         doctors = serialize_documents(doctors)
+
         return api_response(
             status_code=200,
+            success=True,
             message="Doctors list retrieved successfully",
-            error_code=None,
             data=doctors,
         )
 
-    except Exception as e:
-        print(f"Error in get_doctor_list: {e}")
+    except Exception:
+        logger.exception("Error in doctor_list")
+
         return api_response(
             status_code=500,
-            message="Error in retrieving doctor list from the server, cause: " + str(e),
-            error_code=str(e),
-            data=[],
+            success=False,
+            message="Could not retrieve the doctor list",
+            error_code="DOCTOR_LIST_FAILED",
+            data=None,
         )
