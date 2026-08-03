@@ -1,6 +1,6 @@
 from app.core.response import api_response
 from app.core.database import get_database
-from app.utils.object_serializer import serialize_documents
+from app.utils.object_serializer import serialize_data
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ async def doctor_list():
             {"_id": 1, "full_name": 1, "email": 1, "specialization": 1},
         )
         doctors = await cursor.to_list(length=None)
-        doctors = serialize_documents(doctors)
+        doctors = serialize_data(doctors)
 
         return api_response(
             status_code=200,
