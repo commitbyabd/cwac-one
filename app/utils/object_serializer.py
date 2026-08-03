@@ -1,4 +1,4 @@
-# common place to do serialization
+# common place to do serialization make it generic
 
 
 def serialize_document(document: dict) -> dict:

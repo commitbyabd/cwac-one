@@ -2,9 +2,7 @@ from app.core.database import get_database
 from app.core.response import api_response
 from app.core.security import hash_password
 from app.db_functions.auth import get_user_by_email
-import logging
-
-logger = logging.getLogger(__name__)
+from logging_config import logger
 
 
 async def create_doctor(full_name: str, email: str, password: str, specialization: str):
