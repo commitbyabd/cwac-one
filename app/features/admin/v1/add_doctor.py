@@ -10,8 +10,8 @@ async def create_doctor(full_name: str, email: str, password: str, specializatio
         if await get_user_by_email(email):
             return api_response(
                 status_code=409,
-                success=False,
                 message="A user with this email already exists",
+                # success=True,
                 error_code="EMAIL_TAKEN",
                 data=None,
             )
@@ -29,7 +29,6 @@ async def create_doctor(full_name: str, email: str, password: str, specializatio
 
         return api_response(
             status_code=201,
-            success=True,
             message="Doctor created successfully",
             data={"id": str(result.inserted_id)},
         )
@@ -39,7 +38,6 @@ async def create_doctor(full_name: str, email: str, password: str, specializatio
 
         return api_response(
             status_code=500,
-            success=False,
             message="Could not create the doctor",
             error_code="DOCTOR_CREATE_FAILED",
             data=None,

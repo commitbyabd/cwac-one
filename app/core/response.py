@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 
 def api_response(
     status_code: int,
-    success: bool,
     message: str,
+    success: bool | None = None,
     error_code: str | None = None,
     data: dict | list | None = None,
 ):
@@ -12,9 +12,10 @@ def api_response(
     return JSONResponse(
         status_code=status_code,
         content={
-            "success": success,
+            "status_code": status_code,
             "message": message,
+            "success": int(success) if success is not None else int(status_code < 400),
+            "data": data if data is not None else [],
             "error_code": error_code,
-            "data": data,
         },
     )
