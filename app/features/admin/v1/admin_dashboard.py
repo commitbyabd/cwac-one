@@ -27,6 +27,30 @@ async def deactivate_doctor_api(doctor_id: str):
     return await deactivate_doctor(doctor_id)
 
 
+async def edit_doctor_api(
+    doctor_id: str,
+    full_name: str | None = None,
+    email: str | None = None,
+    specialization: str | None = None,
+):
+    return await update_doctor(doctor_id, full_name, email, specialization)
+
+
+async def reactivate_doctor_api(doctor_id: str):
+    return await reactivate_doctor(doctor_id)
+
+
+async def add_doctor_api(
+    full_name: str, email: str, password: str, specialization: str
+):
+    return await create_doctor(full_name, email, password, specialization)
+
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+
+
 async def receptionist_list_api():
     return await receptionist_list()
 
@@ -39,36 +63,17 @@ async def deactivate_receptionist_api(receptionist_id: str):
     return await deactivate_receptionist(receptionist_id)
 
 
-async def reactivate_doctor_api(doctor_id: str):
-    return await reactivate_doctor(doctor_id)
-
-
 async def reactivate_receptionist_api(receptionist_id: str):
     return await reactivate_receptionist(receptionist_id)
-
-
-async def add_doctor_api(
-    full_name: str, email: str, password: str, specialization: str
-):
-    return await create_doctor(full_name, email, password, specialization)
 
 
 async def add_receptionist_api(full_name: str, email: str, password: str):
     return await create_receptionist(full_name, email, password)
 
 
-async def edit_doctor_api(
-    doctor_id: str,
-    full_name: str | None = None,
-    email: str | None = None,
-    specialization: str | None = None,
-) -> bool:
-    return await update_doctor(doctor_id, full_name, email, specialization)
-
-
 async def edit_receptionist_api(
     receptionist_id: str,
     full_name: str | None = None,
     email: str | None = None,
-) -> bool:
+):
     return await update_receptionist(receptionist_id, full_name, email)

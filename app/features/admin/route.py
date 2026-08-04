@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
 from app.dependencies.auth import require_role
 
@@ -16,7 +16,6 @@ from .v1.admin_dashboard import (
     edit_doctor_api,
     edit_receptionist_api,
 )
-from app.core.exceptions import EmailAlreadyExists
 from app.schemas.doctor_create import DoctorCreate
 from app.schemas.doctor_update import DoctorUpdate
 from app.schemas.receptionist_create import ReceptionistCreate
@@ -83,45 +82,21 @@ async def receptionist_list(_: dict = Depends(require_role("admin"))):
 async def one_receptionist(
     receptionist_id: str, _: dict = Depends(require_role("admin"))
 ):
-    receptionist = await get_one_receptionist_api(receptionist_id)
-
-    if receptionist is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Receptionist not found",
-        )
-
-    return receptionist
+    return await get_one_receptionist_api(receptionist_id)
 
 
 @router.patch("/receptionists/{receptionist_id}/deactivate")
 async def deactivate_receptionist(
     receptionist_id: str, _: dict = Depends(require_role("admin"))
 ):
-    deactivated = await deactivate_receptionist_api(receptionist_id)
-
-    if not deactivated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Receptionist not found",
-        )
-
-    return {"message": "Receptionist deactivated successfully"}
+    return await deactivate_receptionist_api(receptionist_id)
 
 
 @router.patch("/receptionists/{receptionist_id}/reactivate")
 async def reactivate_receptionist(
     receptionist_id: str, _: dict = Depends(require_role("admin"))
 ):
-    reactivated = await reactivate_receptionist_api(receptionist_id)
-
-    if not reactivated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Receptionist not found",
-        )
-
-    return {"message": "Receptionist activated successfully"}
+    return await reactivate_receptionist_api(receptionist_id)
 
 
 @router.post("/receptionists")
@@ -141,28 +116,8 @@ async def edit_receptionist(
     receptionist: ReceptionistUpdate,
     _: dict = Depends(require_role("admin")),
 ):
-    if not receptionist.model_dump(exclude_unset=True):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No fields provided to update",
-        )
-
-    try:
-        updated = await edit_receptionist_api(
-            receptionist_id,
-            receptionist.full_name,
-            receptionist.email,
-        )
-    except EmailAlreadyExists:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email already exists",
-        )
-
-    if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Receptionist not found",
-        )
-
-    return {"message": "Receptionist updated successfully"}
+    return await edit_receptionist_api(
+        receptionist_id,
+        receptionist.full_name,
+        receptionist.email,
+    )

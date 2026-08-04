@@ -2,9 +2,7 @@ from app.core.database import get_database
 from app.core.response import api_response
 from app.core.security import hash_password
 from app.db_functions.auth import get_user_by_email
-import logging
-
-logger = logging.getLogger(__name__)
+from logging_config import logger
 
 
 async def create_receptionist(full_name: str, email: str, password: str):
@@ -12,7 +10,6 @@ async def create_receptionist(full_name: str, email: str, password: str):
         if await get_user_by_email(email):
             return api_response(
                 status_code=409,
-                success=False,
                 message="A user with this email already exists",
                 error_code="EMAIL_TAKEN",
                 data=None,
@@ -30,7 +27,6 @@ async def create_receptionist(full_name: str, email: str, password: str):
 
         return api_response(
             status_code=201,
-            success=True,
             message="Receptionist created successfully",
             data={"id": str(result.inserted_id)},
         )
@@ -40,7 +36,6 @@ async def create_receptionist(full_name: str, email: str, password: str):
 
         return api_response(
             status_code=500,
-            success=False,
             message="Could not create the receptionist",
             error_code="RECEPTIONIST_CREATE_FAILED",
             data=None,
