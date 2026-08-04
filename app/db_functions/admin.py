@@ -56,44 +56,6 @@ async def edit_user(user_id: str, role: str, fields: dict) -> bool:
     return result.matched_count == 1
 
 
-# GET Doctor id (one specific doctor) from the following database query
-# ------------------------------------------------------------------------
-async def get_doctor_by_id(doctor_id: str) -> dict | None:
-    try:
-        object_id = ObjectId(doctor_id)
-    except InvalidId:
-        return None  # malformed id, treat the same as "not found"
-
-    doctor = await get_database().users.find_one(
-        {"_id": object_id, "role": "doctor"},
-        {"_id": 1, "full_name": 1, "email": 1, "specialization": 1, "is_active": 1},
-    )
-    # this if statement was added is the id is valid but no doc exists agaisnt that id
-    if doctor is None:
-        return None
-
-    doctor["id"] = str(doctor.pop("_id"))
-    return doctor
-
-
-# $set activation state of the specific doctor by using the following query
-# ------------------------------------------------------------------------
-
-
-async def set_doctor_activation_state(doctor_id: str, is_active: bool) -> bool:
-    try:
-        object_id = ObjectId(doctor_id)
-    except InvalidId:
-        return False  # malformed id, treat the same as "not found"
-
-    result = await get_database().users.update_one(
-        {"_id": object_id, "role": "doctor"},  # role guard: admins are untouchable
-        {"$set": {"is_active": is_active}},
-    )
-
-    return result.matched_count == 1
-
-
 # GET Receptionist list from the following database Query
 # ------------------------------------------------------------------------
 

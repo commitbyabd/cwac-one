@@ -32,41 +32,17 @@ async def doctor_list(_: dict = Depends(require_role("admin"))):
 
 @router.get("/doctors/{doctor_id}")
 async def one_doctor(doctor_id: str, _: dict = Depends(require_role("admin"))):
-    doctor = await get_one_doctor_api(doctor_id)
-
-    if doctor is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Doctor not found",
-        )
-
-    return doctor
+    return await get_one_doctor_api(doctor_id)
 
 
 @router.patch("/doctors/{doctor_id}/deactivate")
 async def deactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admin"))):
-    deactivated = await deactivate_doctor_api(doctor_id)
-
-    if not deactivated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Doctor not found",
-        )
-
-    return {"message": "Doctor deactivated successfully"}
+    return await deactivate_doctor_api(doctor_id)
 
 
 @router.patch("/doctors/{doctor_id}/reactivate")
 async def reactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admin"))):
-    reactivated = await reactivate_doctor_api(doctor_id)
-
-    if not reactivated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Doctor not found",
-        )
-
-    return {"message": "Doctor reactivated successfully"}
+    return await reactivate_doctor_api(doctor_id)
 
 
 @router.post("/doctors")
@@ -85,32 +61,12 @@ async def edit_doctor(
     doctor: DoctorUpdate,
     _: dict = Depends(require_role("admin")),
 ):
-    if not doctor.model_dump(exclude_unset=True):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No fields provided to update",
-        )
-
-    try:
-        updated = await edit_doctor_api(
-            doctor_id,
-            doctor.full_name,
-            doctor.email,
-            doctor.specialization,
-        )
-    except EmailAlreadyExists:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email already exists",
-        )
-
-    if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Doctor not found",
-        )
-
-    return {"message": "Doctor updated successfully"}
+    return await edit_doctor_api(
+        doctor_id,
+        doctor.full_name,
+        doctor.email,
+        doctor.specialization,
+    )
 
 
 # -------------------------------------------------------------------------------------

@@ -1,9 +1,7 @@
 from app.core.response import api_response
 from app.core.database import get_database
 from app.utils.object_serializer import serialize_data
-import logging
-
-logger = logging.getLogger(__name__)
+from logging_config import logger
 
 
 async def doctor_list():
@@ -17,7 +15,6 @@ async def doctor_list():
 
         return api_response(
             status_code=200,
-            success=True,
             message="Doctors list retrieved successfully",
             data=doctors,
         )
@@ -27,7 +24,6 @@ async def doctor_list():
 
         return api_response(
             status_code=500,
-            success=False,
             message="Could not retrieve the doctor list",
             error_code="DOCTOR_LIST_FAILED",
             data=None,
