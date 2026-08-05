@@ -6,7 +6,7 @@ from app.utils.object_serializer import serialize_data
 from logging_config import logger
 
 
-async def one_receptionist_by_id(receptionist_id: str):
+async def get_one_receptionist(receptionist_id: str):
     try:
         # malformed id, treat the same as "not found"
         if not ObjectId.is_valid(receptionist_id):

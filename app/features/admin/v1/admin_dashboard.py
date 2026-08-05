@@ -2,10 +2,10 @@
 # out admin dashboard will be able to perform on doctors and receptionists.
 
 from .doctor_list import doctor_list
-from .get_one_doctor import one_doctor_by_id
+from .get_one_doctor import get_one_doctor
 from .set_doctor_state import set_doctor_state
 from .receptionist_list import receptionist_list
-from .get_one_receptionist import one_receptionist_by_id
+from .get_one_receptionist import get_one_receptionist
 from .set_receptionist_state import set_receptionist_state
 from .add_doctor import create_doctor
 from .add_receptionist import create_receptionist
@@ -18,7 +18,7 @@ async def doctor_list_api():
 
 
 async def get_one_doctor_api(doctor_id: str):
-    return await one_doctor_by_id(doctor_id)
+    return await get_one_doctor(doctor_id)
 
 
 async def deactivate_doctor_api(doctor_id: str):
@@ -54,7 +54,7 @@ async def receptionist_list_api():
 
 
 async def get_one_receptionist_api(receptionist_id: str):
-    return await one_receptionist_by_id(receptionist_id)
+    return await get_one_receptionist(receptionist_id)
 
 
 async def deactivate_receptionist_api(receptionist_id: str):
