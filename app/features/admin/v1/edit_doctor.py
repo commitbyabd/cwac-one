@@ -5,7 +5,7 @@ from app.db_functions.auth import get_user_by_email
 from logging_config import logger
 
 
-async def update_doctor(
+async def edit_doctor(
     doctor_id: str,
     full_name: str | None = None,
     email: str | None = None,

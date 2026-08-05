@@ -5,7 +5,7 @@ from app.db_functions.auth import get_user_by_email
 from logging_config import logger
 
 
-async def update_receptionist(
+async def edit_receptionist(
     receptionist_id: str,
     full_name: str | None = None,
     email: str | None = None,

@@ -7,10 +7,10 @@ from .set_doctor_state import set_doctor_state
 from .receptionist_list import receptionist_list
 from .get_one_receptionist import get_one_receptionist
 from .set_receptionist_state import set_receptionist_state
-from .add_doctor import create_doctor
-from .add_receptionist import create_receptionist
-from .edit_doctor import update_doctor
-from .edit_receptionist import update_receptionist
+from .add_doctor import add_doctor
+from .add_receptionist import add_receptionist
+from .edit_doctor import edit_doctor
+from .edit_receptionist import edit_receptionist
 
 
 async def doctor_list_api():
@@ -31,7 +31,7 @@ async def edit_doctor_api(
     email: str | None = None,
     specialization: str | None = None,
 ):
-    return await update_doctor(doctor_id, full_name, email, specialization)
+    return await edit_doctor(doctor_id, full_name, email, specialization)
 
 
 async def reactivate_doctor_api(doctor_id: str):
@@ -41,7 +41,7 @@ async def reactivate_doctor_api(doctor_id: str):
 async def add_doctor_api(
     full_name: str, email: str, password: str, specialization: str
 ):
-    return await create_doctor(full_name, email, password, specialization)
+    return await add_doctor(full_name, email, password, specialization)
 
 
 # -------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ async def reactivate_receptionist_api(receptionist_id: str):
 
 
 async def add_receptionist_api(full_name: str, email: str, password: str):
-    return await create_receptionist(full_name, email, password)
+    return await add_receptionist(full_name, email, password)
 
 
 async def edit_receptionist_api(
@@ -74,4 +74,4 @@ async def edit_receptionist_api(
     full_name: str | None = None,
     email: str | None = None,
 ):
-    return await update_receptionist(receptionist_id, full_name, email)
+    return await edit_receptionist(receptionist_id, full_name, email)

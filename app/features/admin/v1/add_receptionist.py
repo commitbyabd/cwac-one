@@ -5,7 +5,7 @@ from app.db_functions.auth import get_user_by_email
 from logging_config import logger
 
 
-async def create_receptionist(full_name: str, email: str, password: str):
+async def add_receptionist(full_name: str, email: str, password: str):
     try:
         if await get_user_by_email(email):
             return api_response(
