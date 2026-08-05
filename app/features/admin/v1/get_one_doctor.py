@@ -44,7 +44,7 @@ async def get_one_doctor(doctor_id: str):
         )
 
     except Exception:
-        logger.exception("Error in one_doctor_by_id")
+        logger.exception("Error in get_one_doctor")
 
         return api_response(
             status_code=500,

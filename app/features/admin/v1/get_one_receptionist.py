@@ -43,7 +43,7 @@ async def get_one_receptionist(receptionist_id: str):
         )
 
     except Exception:
-        logger.exception("Error in one_receptionist_by_id")
+        logger.exception("Error in get_one_receptionist")
 
         return api_response(
             status_code=500,

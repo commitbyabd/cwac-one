@@ -4,7 +4,7 @@ from app.utils.object_serializer import serialize_data
 from logging_config import logger
 
 
-async def receptionist_list():
+async def get_receptionist_list():
     try:
         cursor = get_database().users.find(
             {"role": "receptionist", "is_active": True},
@@ -20,7 +20,7 @@ async def receptionist_list():
         )
 
     except Exception:
-        logger.exception("Error in receptionist_list")
+        logger.exception("Error in get_receptionist_list")
 
         return api_response(
             status_code=500,

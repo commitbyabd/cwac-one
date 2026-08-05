@@ -1,10 +1,10 @@
 # This is the file which will be the middleware of all of the functions that
 # out admin dashboard will be able to perform on doctors and receptionists.
 
-from .doctor_list import doctor_list
+from .get_doctor_list import get_doctor_list
 from .get_one_doctor import get_one_doctor
 from .set_doctor_state import set_doctor_state
-from .receptionist_list import receptionist_list
+from .get_receptionist_list import get_receptionist_list
 from .get_one_receptionist import get_one_receptionist
 from .set_receptionist_state import set_receptionist_state
 from .add_doctor import add_doctor
@@ -14,7 +14,7 @@ from .edit_receptionist import edit_receptionist
 
 
 async def doctor_list_api():
-    return await doctor_list()
+    return await get_doctor_list()
 
 
 async def get_one_doctor_api(doctor_id: str):
@@ -50,7 +50,7 @@ async def add_doctor_api(
 
 
 async def receptionist_list_api():
-    return await receptionist_list()
+    return await get_receptionist_list()
 
 
 async def get_one_receptionist_api(receptionist_id: str):

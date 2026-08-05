@@ -32,7 +32,7 @@ async def add_receptionist(full_name: str, email: str, password: str):
         )
 
     except Exception:
-        logger.exception("Error in create_receptionist")
+        logger.exception("Error in add_receptionist")
 
         return api_response(
             status_code=500,

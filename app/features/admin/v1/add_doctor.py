@@ -34,7 +34,7 @@ async def add_doctor(full_name: str, email: str, password: str, specialization: 
         )
 
     except Exception:
-        logger.exception("Error in create_doctor")
+        logger.exception("Error in add_doctor")
 
         return api_response(
             status_code=500,

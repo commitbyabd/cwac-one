@@ -4,7 +4,7 @@ from app.utils.object_serializer import serialize_data
 from logging_config import logger
 
 
-async def doctor_list():
+async def get_doctor_list():
     try:
         cursor = get_database().users.find(
             {"role": "doctor", "is_active": True},
@@ -20,7 +20,7 @@ async def doctor_list():
         )
 
     except Exception:
-        logger.exception("Error in doctor_list")
+        logger.exception("Error in get_doctor_list")
 
         return api_response(
             status_code=500,

@@ -47,7 +47,7 @@ async def edit_receptionist(
                 data=None,
             )
 
-        updated = await update_receptionist_query(receptionist_id, fields)
+        updated = await edit_receptionist_query(receptionist_id, fields)
 
         if not updated:
             return api_response(
@@ -64,7 +64,7 @@ async def edit_receptionist(
         )
 
     except Exception:
-        logger.exception("Error in update_receptionist")
+        logger.exception("Error in edit_receptionist")
 
         return api_response(
             status_code=500,
@@ -74,7 +74,7 @@ async def edit_receptionist(
         )
 
 
-async def update_receptionist_query(receptionist_id: str, fields: dict) -> bool:
+async def edit_receptionist_query(receptionist_id: str, fields: dict) -> bool:
     result = await get_database().users.update_one(
         {
             "_id": ObjectId(receptionist_id),

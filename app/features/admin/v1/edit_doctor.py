@@ -51,7 +51,7 @@ async def edit_doctor(
                 data=None,
             )
 
-        updated = await update_doctor_query(doctor_id, fields)
+        updated = await edit_doctor_query(doctor_id, fields)
 
         if not updated:
             return api_response(
@@ -68,7 +68,7 @@ async def edit_doctor(
         )
 
     except Exception:
-        logger.exception("Error in update_doctor")
+        logger.exception("Error in edit_doctor")
 
         return api_response(
             status_code=500,
@@ -78,7 +78,7 @@ async def edit_doctor(
         )
 
 
-async def update_doctor_query(doctor_id: str, fields: dict) -> bool:
+async def edit_doctor_query(doctor_id: str, fields: dict) -> bool:
     result = await get_database().users.update_one(
         {
             "_id": ObjectId(doctor_id),
