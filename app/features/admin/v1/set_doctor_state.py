@@ -5,7 +5,21 @@ from app.core.response import api_response
 from logging_config import logger
 
 
-async def reactivate_doctor(doctor_id: str):
+async def set_doctor_state(doctor_id: str, is_active: bool):
+    # activating and deactivating are the same operation, only the wording differs
+    if is_active:
+        verb, action, failure_code = (
+            "reactivated",
+            "reactivate",
+            "DOCTOR_REACTIVATE_FAILED",
+        )
+    else:
+        verb, action, failure_code = (
+            "deactivated",
+            "deactivate",
+            "DOCTOR_DEACTIVATE_FAILED",
+        )
+
     try:
         # malformed id, treat the same as "not found"
         if not ObjectId.is_valid(doctor_id):
@@ -21,7 +35,7 @@ async def reactivate_doctor(doctor_id: str):
                 "_id": ObjectId(doctor_id),
                 "role": "doctor",
             },  # role guard: admins are untouchable
-            {"$set": {"is_active": True}},
+            {"$set": {"is_active": is_active}},
         )
 
         if result.matched_count == 0:
@@ -34,16 +48,16 @@ async def reactivate_doctor(doctor_id: str):
 
         return api_response(
             status_code=200,
-            message="Doctor reactivated successfully",
+            message=f"Doctor {verb} successfully",
             data=None,
         )
 
     except Exception:
-        logger.exception("Error in reactivate_doctor")
+        logger.exception("Error in set_doctor_state")
 
         return api_response(
             status_code=500,
-            message="Could not reactivate the doctor",
-            error_code="DOCTOR_REACTIVATE_FAILED",
+            message=f"Could not {action} the doctor",
+            error_code=failure_code,
             data=None,
         )
