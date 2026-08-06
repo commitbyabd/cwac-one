@@ -2,7 +2,7 @@ import { Mail } from "lucide-react";
 import TextField from "../../ui/TextField.jsx";
 import IconBox from "../../ui/IconBox.jsx";
 
-function EmailField({ error }) {
+function EmailField({ error, ...props }) {
   return (
     <TextField
       id="email"
@@ -12,6 +12,7 @@ function EmailField({ error }) {
       placeholder="you@clinic.com"
       autoComplete="email"
       error={error}
+      {...props}
       icon={
         <IconBox className="bg-lavender">
           <Mail className="size-4 text-violet" strokeWidth={2} />

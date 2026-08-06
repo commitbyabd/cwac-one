@@ -1,11 +1,7 @@
 import StaffBadge from "./StaffBadge.jsx";
 import SignupHeading from "./SignupHeading.jsx";
-import EmailField from "./EmailField.jsx";
-import PasswordField from "./PasswordField.jsx";
+import LoginForm from "./LoginForm.jsx";
 import SecurityNote from "./SecurityNote.jsx";
-import Button from "../../ui/Button.jsx";
-import IconBox from "../../ui/IconBox.jsx";
-import { ArrowRight } from "lucide-react";
 
 /*
   Layout only.
@@ -16,8 +12,8 @@ import { ArrowRight } from "lucide-react";
     badge → heading      24px  (mt-6)
     heading → description 8px  (inside SignupHeading)
     description → form   32px  (mt-8)
-    field → field        22px  (space-y)
-    password → button    20px  (mt-5)
+    field → field        22px  (inside LoginForm)
+    password → button    20px  (inside LoginForm)
     button → security    28px  (mt-7)
 */
 function SignupMain() {
@@ -30,27 +26,9 @@ function SignupMain() {
           <SignupHeading />
         </div>
 
-        <form className="mt-8" onSubmit={(event) => event.preventDefault()}>
-          <div className="space-y-5.5">
-            <EmailField />
-            <PasswordField />
-          </div>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            fullWidth
-            className="mt-5"
-            trailingIcon={
-              <IconBox size="size-[34px]" className="bg-white/15">
-                <ArrowRight className="size-4.5 text-white" strokeWidth={2.25} />
-              </IconBox>
-            }
-          >
-            Enter workspace
-          </Button>
-        </form>
+        <div className="mt-8">
+          <LoginForm />
+        </div>
 
         <div className="mt-7">
           <SecurityNote />

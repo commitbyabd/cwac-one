@@ -3,7 +3,7 @@ import { Lock, Eye, EyeOff } from "lucide-react";
 import TextField from "../../ui/TextField.jsx";
 import IconBox from "../../ui/IconBox.jsx";
 
-function PasswordField({ error }) {
+function PasswordField({ error, ...props }) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -15,6 +15,7 @@ function PasswordField({ error }) {
       placeholder="Enter your password"
       autoComplete="current-password"
       error={error}
+      {...props}
       icon={
         <IconBox className="bg-password-icon-bg">
           <Lock className="size-4 text-coral" strokeWidth={2} />
