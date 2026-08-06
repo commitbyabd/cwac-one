@@ -29,7 +29,13 @@ const unwrap = async (request) => {
 // GET /admin/doctors -> data: array of active doctors
 export const listDoctors = () => unwrap(api.get("/admin/doctors"));
 
-// GET /admin/doctors/{id} -> data: one doctor
+/*
+  GET /admin/doctors/{id} -> data: one doctor
+
+  Unused for now: the list already returns every field the cards show. Kept
+  for the detail view, once a doctor record carries more than the list is
+  willing to send.
+*/
 export const getDoctor = (doctorId) => unwrap(api.get(`/admin/doctors/${doctorId}`));
 
 // POST /admin/doctors -> data: { id } of the new doctor
@@ -56,7 +62,12 @@ export const reactivateDoctor = (doctorId) =>
 // GET /admin/receptionists -> data: array of active receptionists
 export const listReceptionists = () => unwrap(api.get("/admin/receptionists"));
 
-// GET /admin/receptionists/{id} -> data: one receptionist
+/*
+  GET /admin/receptionists/{id} -> data: one receptionist
+
+  Unused for now, for the same reason as getDoctor: the list carries
+  everything the current screens need. Kept for the detail view.
+*/
 export const getReceptionist = (receptionistId) =>
   unwrap(api.get(`/admin/receptionists/${receptionistId}`));
 
