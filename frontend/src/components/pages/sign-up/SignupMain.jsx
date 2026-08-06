@@ -4,6 +4,7 @@ import EmailField from "./EmailField.jsx";
 import PasswordField from "./PasswordField.jsx";
 import SecurityNote from "./SecurityNote.jsx";
 import Button from "../../ui/Button.jsx";
+import IconBox from "../../ui/IconBox.jsx";
 import { ArrowRight } from "lucide-react";
 
 /*
@@ -37,8 +38,15 @@ function SignupMain() {
 
           <Button
             type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
             className="mt-5"
-            trailingIcon={<ArrowRight className="size-4.5 text-white" strokeWidth={2.25} />}
+            trailingIcon={
+              <IconBox size="size-[34px]" className="bg-white/15">
+                <ArrowRight className="size-4.5 text-white" strokeWidth={2.25} />
+              </IconBox>
+            }
           >
             Enter workspace
           </Button>

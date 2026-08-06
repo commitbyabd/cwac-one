@@ -1,10 +1,33 @@
 /*
-  Generic primary button — gradient surface, left-aligned label,
-  optional icon parked in a translucent square on the right.
-  Reuse this everywhere; do not re-style buttons per page.
+  The one button in the system. Never restyle a button per page —
+  add a variant here instead.
+
+  variant: primary | plum | outline | danger
+  size:    sm | md | lg
+  fullWidth pushes the label left and any trailingIcon right.
 */
+const VARIANTS = {
+  primary:
+    "bg-(image:--gradient-primary-button) text-white shadow-button hover:-translate-y-px hover:filter-(--filter-button-hover) focus-visible:ring-violet/22",
+  plum: "bg-plum text-white shadow-button hover:-translate-y-px hover:bg-plum-deep focus-visible:ring-violet/22",
+  outline:
+    "border border-border bg-white text-plum shadow-sm hover:-translate-y-px hover:bg-pale-lavender focus-visible:ring-violet/22",
+  danger:
+    "text-error hover:bg-error-bg focus-visible:ring-error/30",
+};
+
+const SIZES = {
+  sm: "h-9 gap-2 px-3 text-sm",
+  md: "h-11 gap-2 px-4 text-md",
+  lg: "h-(--button-height) gap-3 px-5 text-md-lg",
+};
+
 function Button({
   children,
+  variant = "primary",
+  size = "md",
+  fullWidth = false,
+  leadingIcon,
   trailingIcon,
   type = "button",
   className = "",
@@ -13,15 +36,14 @@ function Button({
   return (
     <button
       type={type}
-      className={`flex h-(--button-height) w-full items-center justify-between rounded-md bg-(image:--gradient-primary-button) px-5 font-primary text-md-lg font-semibold text-white shadow-button transition duration-200 hover:-translate-y-px hover:filter-(--filter-button-hover) focus-visible:ring-4 focus-visible:ring-violet/22 focus-visible:outline-none ${className}`}
+      className={`inline-flex shrink-0 items-center rounded-md font-primary font-semibold transition duration-200 focus-visible:ring-4 focus-visible:outline-none ${
+        fullWidth ? "w-full justify-between" : "justify-center"
+      } ${SIZES[size]} ${VARIANTS[variant]} ${className}`}
       {...rest}
     >
+      {leadingIcon}
       <span>{children}</span>
-      {trailingIcon && (
-        <span className="grid size-[34px] shrink-0 place-items-center rounded-sm bg-white/15">
-          {trailingIcon}
-        </span>
-      )}
+      {trailingIcon}
     </button>
   );
 }
