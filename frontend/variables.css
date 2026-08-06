@@ -1,0 +1,195 @@
+/* =========================
+   variables.css
+   CWAC — Aurora Reception
+========================= */
+
+/*
+Variables:
+- Fonts
+- Font sizes
+- Heading sizes
+- Weights
+- Colors
+- Alpha variants
+- Gradients
+- Layout / radius / shadows
+*/
+
+:root {
+  /* Fonts */
+  --font-family-primary: "Quicksand", sans-serif;
+  --font-family-secondary: "Inter", system-ui, sans-serif;
+  --font-family-tertiary: "Frank Ruhl Libre", serif;
+
+  /* Font sizes */
+  --font-xxs: 10px;
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-md: 16px;
+  --font-md-lg: 18px;
+  --font-standard: 20px;
+  --font-md-xl: 22px;
+  --font-lg: 24px;
+  --font-xl: 28px;
+  --font-2xl: 32px;
+  --font-3xl: 36px;
+  --font-4xl: 64px;
+
+  /* Heading sizes */
+  --heading-xs: 20px;
+  --heading-sm: 26px;
+  --heading: 32px;
+  --heading-lg: 38px;
+  --heading-xl: 48px;
+  --heading-2xl: 58px;
+  --heading-3xl: 64px;
+
+  /* Typography */
+  --title-size: var(--heading-lg);
+  --content-size: 16px;
+  --title-font: var(--font-family-primary);
+  --content-font: var(--font-family-primary);
+  --title-weight: 700;
+  --content-weight: 500;
+
+  /* Weights — names match the CSS spec values */
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Line heights */
+  --line-height-heading: 1.25;
+  --line-height-body: 1.55;
+
+  /* Letter spacing (em, not %) */
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-none: 0em;
+
+  /* =========================
+     Icons — single source of truth
+     - Change --icon-size to resize every icon site-wide
+     - Change --icon-color to recolor every icon site-wide
+     - Per-instance override:
+         style={{ "--icon-size": "20px", "--icon-color": "#7867F2" }}
+  ========================= */
+  --icon-size: 22px;
+  --icon-color: currentColor;
+
+  /* Layout */
+  --padding-card: 32px;
+  --padding-layout: 32px 64px;
+  --padding-input: 12px 16px;
+  --padding-button: 16px 24px;
+  --gap-card: 20px;
+  --login-card-width: 460px;
+  --input-height: 52px;
+  --button-height: 56px;
+
+  /* Colors — brand */
+  --color-plum: #2b193d;
+  /* headings, badges, branding panel */
+  --color-plum-deep: #21122f;
+  /* medical cross in the logo */
+  --color-violet: #7867f2;
+  /* focus, email icon, button gradient */
+  --color-violet-hover: #6857de;
+  --color-violet-bright: #8a70f5;
+  --color-coral: #ff7a70;
+  /* logo, password icon, button gradient */
+  --color-seafoam: #b8f2e5;
+  /* badges, success states */
+  --color-butter: #ffe8a8;
+
+  /* Colors — surfaces */
+  --color-porcelain: #fffcf8;
+  --color-lavender: #f1ecff;
+  --color-warm-blush: #fff8f2;
+  --color-pale-lavender: #f7f2ff;
+  --color-mint-white: #f5fffc;
+  --color-input-surface: #fbf8fc;
+  --color-password-icon-bg: #fff0ed;
+  --color-password-toggle-hover: #faf5ff;
+
+  /* Colors — branding panel */
+  --color-aubergine: #3a2450;
+  --color-indigo-plum: #32235b;
+
+  /* Colors — text */
+  --color-ink: #2a2330;
+  --color-muted: #766d7c;
+  --color-white: #ffffff;
+
+  /* Colors — border */
+  --color-border: #e9e0ef;
+
+  /* Colors — feedback */
+  --color-error: #c94f64;
+  --color-error-bg: #fcecef;
+
+  /* Alpha variants */
+  --porcelain-90: rgba(255, 252, 248, 0.9);
+  --white-82: rgba(255, 255, 255, 0.82);
+  --white-65: rgba(255, 255, 255, 0.65);
+  --white-60: rgba(255, 255, 255, 0.6);
+  --white-15: rgba(255, 255, 255, 0.15);
+  --white-14: rgba(255, 255, 255, 0.14);
+  --white-13: rgba(255, 255, 255, 0.13);
+  --white-08: rgba(255, 255, 255, 0.08);
+  --plum-17: rgba(43, 25, 61, 0.17);
+  --violet-28: rgba(120, 103, 242, 0.28);
+  --violet-24: rgba(120, 103, 242, 0.24);
+  --violet-22: rgba(120, 103, 242, 0.22);
+  --violet-16: rgba(120, 103, 242, 0.16);
+  --coral-34: rgba(255, 122, 112, 0.34);
+  --coral-15: rgba(255, 122, 112, 0.15);
+  --seafoam-65: rgba(184, 242, 229, 0.65);
+  --seafoam-11: rgba(184, 242, 229, 0.11);
+  --butter-12: rgba(255, 232, 168, 0.12);
+
+  /* Gradients */
+  --gradient-page:
+    radial-gradient(circle at 4% 8%, var(--coral-34), transparent 27%),
+    radial-gradient(circle at 94% 12%, var(--seafoam-65), transparent 30%),
+    radial-gradient(circle at 82% 94%, var(--violet-24), transparent 30%),
+    linear-gradient(
+      135deg,
+      var(--color-warm-blush) 0%,
+      var(--color-pale-lavender) 48%,
+      var(--color-mint-white) 100%
+    );
+
+  --gradient-brand-panel:
+    radial-gradient(circle at 20% 20%, var(--white-14), transparent 25%),
+    linear-gradient(
+      160deg,
+      var(--color-plum) 0%,
+      var(--color-aubergine) 56%,
+      var(--color-indigo-plum) 100%
+    );
+
+  --gradient-primary-button: linear-gradient(
+    110deg,
+    var(--color-violet),
+    var(--color-violet-bright) 55%,
+    var(--color-coral)
+  );
+
+  /* Borders and radius */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --rounded: 100px;
+
+  /* Shadows */
+  --shadow-card: 0 28px 80px var(--plum-17);
+  --shadow-button: 0 12px 26px var(--violet-28);
+  --shadow-input-focus: 0 0 0 4px var(--violet-16);
+  --shadow-button-focus: 0 0 0 4px var(--violet-22);
+
+  /* Effects */
+  --blur-card: blur(18px);
+  --blur-glass: blur(12px);
+  --filter-button-hover: saturate(1.08) brightness(0.98);
+}
