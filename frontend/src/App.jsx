@@ -1,8 +1,16 @@
+import { BrowserRouter } from "react-router-dom";
+import ProjectRoutes from "./routes/ProjectRoutes.jsx";
+
+/*
+  App is the composition root.
+  Its only job is to mount the router — every screen is chosen
+  inside ProjectRoutes, never here.
+*/
 function App() {
   return (
-    <h1 className="text-[var(--heading-sm)] bg-[var(--color-plum)] font-[var(--font-family-primary)]">
-      Hello World
-    </h1>
+    <BrowserRouter>
+      <ProjectRoutes />
+    </BrowserRouter>
   );
 }
 
