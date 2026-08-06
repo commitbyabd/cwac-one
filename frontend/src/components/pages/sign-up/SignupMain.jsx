@@ -1,22 +1,52 @@
-/*
-  The real signup screen — build the form here.
-  Placeholder markup below is only a smoke test that routing and the
-  Aurora Reception tokens are both live. Replace it freely.
+import StaffBadge from "./StaffBadge.jsx";
+import SignupHeading from "./SignupHeading.jsx";
+import EmailField from "./EmailField.jsx";
+import PasswordField from "./PasswordField.jsx";
+import SecurityNote from "./SecurityNote.jsx";
+import Button from "../../ui/Button.jsx";
+import { ArrowRight } from "lucide-react";
 
-  Note the shorthand for :root variables that have no utility class:
-  bg-(image:--gradient-page) is Tailwind 4's canonical form of
-  bg-[image:var(--gradient-page)]. Both compile the same.
+/*
+  Layout only.
+  Every visual piece lives in its own file — this component just
+  arranges them and owns the spacing between them.
+
+  Vertical rhythm (per spec):
+    badge → heading      24px  (mt-6)
+    heading → description 8px  (inside SignupHeading)
+    description → form   32px  (mt-8)
+    field → field        22px  (space-y)
+    password → button    20px  (mt-5)
+    button → security    28px  (mt-7)
 */
 function SignupMain() {
   return (
-    <main className="grid min-h-screen place-items-center bg-(image:--gradient-page)">
-      <section className="w-(--login-card-width) rounded-xl bg-porcelain p-(--padding-card) shadow-card">
-        <h1 className="font-primary text-heading-lg leading-heading font-bold tracking-tight text-plum">
-          Create your account
-        </h1>
-        <p className="font-primary text-md leading-body mt-2 text-muted">
-          SignupMain is mounted. Routing works — start the form here.
-        </p>
+    <main className="grid min-h-screen place-items-center bg-(image:--gradient-page) px-4 py-10 sm:px-6">
+      <section className="w-full max-w-(--login-card-width) rounded-xl border border-white/75 bg-porcelain/88 p-6 shadow-card backdrop-blur-card sm:p-10">
+        <StaffBadge />
+
+        <div className="mt-6">
+          <SignupHeading />
+        </div>
+
+        <form className="mt-8" onSubmit={(event) => event.preventDefault()}>
+          <div className="space-y-5.5">
+            <EmailField />
+            <PasswordField />
+          </div>
+
+          <Button
+            type="submit"
+            className="mt-5"
+            trailingIcon={<ArrowRight className="size-4.5 text-white" strokeWidth={2.25} />}
+          >
+            Enter workspace
+          </Button>
+        </form>
+
+        <div className="mt-7">
+          <SecurityNote />
+        </div>
       </section>
     </main>
   );
