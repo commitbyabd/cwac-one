@@ -6,7 +6,7 @@ import PasswordField from "./PasswordField.jsx";
 import Button from "../../ui/Button.jsx";
 import IconBox from "../../ui/IconBox.jsx";
 import Alert from "../../ui/Alert.jsx";
-import { login, saveToken, readApiError } from "../../../api/auth.js";
+import { login, saveToken, saveUser, readApiError } from "../../../api/auth.js";
 
 /*
   Owns the form state and the POST /login call.
@@ -43,6 +43,10 @@ function LoginForm() {
       const data = await login(values);
       const token = data?.access_token ?? data?.token;
       if (token) saveToken(token);
+
+      // Name and role are only sent here, so cache them for the header.
+      saveUser({ full_name: data?.full_name ?? "", role: data?.role ?? "" });
+
       navigate("/dashboard");
     } catch (error) {
       setFormError(readApiError(error));

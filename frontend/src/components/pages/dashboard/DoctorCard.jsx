@@ -3,7 +3,14 @@ import Avatar from "../../ui/Avatar.jsx";
 import DoctorInfo from "./DoctorInfo.jsx";
 import DoctorActions from "./DoctorActions.jsx";
 
-function DoctorCard({ initials, name, specialty, role, email }) {
+/*
+  One staff row. Serves doctors and receptionists alike — 'specialty' is
+  simply absent for the latter.
+
+  Presentation only: it is handed plain strings and two callbacks, and
+  knows nothing about the API's field names.
+*/
+function DoctorCard({ initials, name, specialty, role, email, onEdit, onDeactivate }) {
   return (
     <Card className="bg-porcelain/92 p-4 shadow-[0_12px_30px_var(--plum-17)] sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
@@ -17,7 +24,11 @@ function DoctorCard({ initials, name, specialty, role, email }) {
           />
         </div>
 
-        <DoctorActions name={name} />
+        <DoctorActions
+          name={name}
+          onEdit={onEdit}
+          onDeactivate={onDeactivate}
+        />
       </div>
     </Card>
   );

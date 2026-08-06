@@ -20,7 +20,12 @@ const ITEMS = [
   },
 ];
 
-function ManagePanel({ activeTitle = "Doctors" }) {
+/*
+  The sidebar is a controlled component: it renders whichever item the
+  parent says is active and reports clicks back, rather than tracking a
+  selection the list would then have to stay in sync with.
+*/
+function ManagePanel({ activeTitle = "Doctors", onSelect }) {
   return (
     <Card
       as="nav"
@@ -39,6 +44,7 @@ function ManagePanel({ activeTitle = "Doctors" }) {
             title={item.title}
             subtitle={item.subtitle}
             active={item.title === activeTitle}
+            onClick={() => onSelect?.(item.title)}
           />
         ))}
       </div>

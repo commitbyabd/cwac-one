@@ -15,6 +15,11 @@ const api = axios.create({
 // other way around).
 export const TOKEN_KEY = "cwac_token";
 
+// The signed-in user's display details. Lives here for the same reason as
+// TOKEN_KEY: the 401 handler below has to clear it, and auth.js is the one
+// importing from this file.
+export const USER_KEY = "cwac_user";
+
 //An interceptor is a function axios runs on every outgoing request before it leaves. You get the config, mutate it, return it.
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY);
@@ -40,6 +45,7 @@ api.interceptors.response.use(
 
     if (status === 401 && !url.includes("/auth/login")) {
       localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
 
       // A full page load, not a router navigation: this file is plain JS
       // outside the React tree, so hooks like useNavigate are unavailable.

@@ -6,12 +6,16 @@ function DoctorInfo({ name, specialty, role, email }) {
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <p className="font-primary text-md-lg font-semibold text-plum">{name}</p>
-        <Badge
-          dot={false}
-          className="border border-border bg-pale-lavender text-violet"
-        >
-          {specialty}
-        </Badge>
+
+        {/* Receptionists have no specialization, so the badge is optional. */}
+        {specialty && (
+          <Badge
+            dot={false}
+            className="border border-border bg-pale-lavender text-violet"
+          >
+            {specialty}
+          </Badge>
+        )}
       </div>
 
       <p className="mt-1 font-primary text-sm text-muted">{role}</p>

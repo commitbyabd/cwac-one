@@ -29,4 +29,7 @@ async def login(login_data: UserLogin):
         "access_token": token,
         "token_type": "bearer",
         "role": user["role"],
+        # the dashboard greets the user by name, and the token carries only
+        # the id and the role, so the name is sent once at sign in
+        "full_name": user["full_name"],
     }
