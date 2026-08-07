@@ -23,13 +23,26 @@ function StaffCard({
   onEdit,
   onDeactivate,
 }) {
+  // Enter and Space are what a mouse click means for a keyboard. The target
+  // check keeps a keypress on Edit or Deactivate from also toggling the row.
+  const handleKeyDown = (event) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    onSelect?.();
+  };
+
   return (
     // Clicks on the action buttons bubble up and select the row too, which
     // is intended: acting on a row is a stronger "this one" than clicking it.
     <Card
+      role="option"
+      aria-selected={selected}
+      tabIndex={0}
       onClick={onSelect}
-      aria-current={selected ? "true" : undefined}
-      className={`cursor-pointer p-4 shadow-[0_12px_30px_var(--plum-17)] transition duration-200 sm:p-5 ${
+      onKeyDown={handleKeyDown}
+      className={`cursor-pointer p-4 shadow-[0_12px_30px_var(--plum-17)] transition duration-200 focus-visible:ring-4 focus-visible:ring-violet/22 focus-visible:outline-none sm:p-5 ${
         selected
           ? "animate-selected-pulse border-coral bg-warm-blush outline-3 outline-transparent"
           : "bg-porcelain/92 hover:border-violet/40"
@@ -46,11 +59,7 @@ function StaffCard({
           />
         </div>
 
-        <StaffActions
-          name={name}
-          onEdit={onEdit}
-          onDeactivate={onDeactivate}
-        />
+        <StaffActions name={name} onEdit={onEdit} onDeactivate={onDeactivate} />
       </div>
     </Card>
   );

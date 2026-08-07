@@ -1,4 +1,4 @@
-function SignupHeading() {
+function LoginHeading() {
   return (
     <div>
       <h1 className="font-primary text-heading-sm leading-heading font-semibold tracking-tight text-plum sm:text-heading">
@@ -12,4 +12,4 @@ function SignupHeading() {
   );
 }
 
-export default SignupHeading;
+export default LoginHeading;

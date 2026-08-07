@@ -23,10 +23,12 @@ export const listDoctors = () => unwrap(api.get("/admin/doctors"));
 // Unused by the current screens: the list carries every field the cards
 // render. Kept for a detail view, where a record shows more than the list
 // projection sends.
-export const getDoctor = (doctorId) => unwrap(api.get(`/admin/doctors/${doctorId}`));
+export const getDoctor = (doctorId) =>
+  unwrap(api.get(`/admin/doctors/${doctorId}`));
 
 // payload: { full_name, email, password, specialization }
-export const createDoctor = (payload) => unwrap(api.post("/admin/doctors", payload));
+export const createDoctor = (payload) =>
+  unwrap(api.post("/admin/doctors", payload));
 
 // payload: { full_name, email, specialization }, all optional
 export const updateDoctor = (doctorId, payload) =>

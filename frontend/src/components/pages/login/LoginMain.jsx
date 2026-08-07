@@ -1,4 +1,4 @@
-import SignupHeading from "./SignupHeading.jsx";
+import LoginHeading from "./LoginHeading.jsx";
 import LoginForm from "./LoginForm.jsx";
 import SecurityNote from "./SecurityNote.jsx";
 
@@ -10,11 +10,11 @@ import SecurityNote from "./SecurityNote.jsx";
     description -> form   32px (mt-8)
     button -> security    28px (mt-7)
 */
-function SignupMain() {
+function LoginMain() {
   return (
     <main className="grid min-h-screen place-items-center bg-(image:--gradient-page) px-4 py-10 sm:px-6">
       <section className="w-full max-w-(--login-card-width) rounded-xl border border-white/75 bg-porcelain/88 p-6 shadow-card backdrop-blur-card sm:p-10">
-        <SignupHeading />
+        <LoginHeading />
 
         <div className="mt-8">
           <LoginForm />
@@ -28,4 +28,4 @@ function SignupMain() {
   );
 }
 
-export default SignupMain;
+export default LoginMain;

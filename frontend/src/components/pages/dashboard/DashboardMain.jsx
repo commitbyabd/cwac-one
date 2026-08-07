@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import DashboardHeader from "./DashboardHeader.jsx";
 import ManagePanel from "./ManagePanel.jsx";
@@ -9,53 +10,33 @@ import ConfirmDialog from "../../ui/ConfirmDialog.jsx";
 import Alert from "../../ui/Alert.jsx";
 import Button from "../../ui/Button.jsx";
 import Toast from "../../ui/Toast.jsx";
-import {
-  listDoctors,
-  listReceptionists,
-  deactivateDoctor,
-  deactivateReceptionist,
-} from "../../../api/admin.js";
+import Pagination from "../../ui/Pagination.jsx";
 import { readApiError } from "../../../api/auth.js";
+import { DEFAULT_VIEW_SLUG, findView } from "../../../config/staffViews.js";
+import { useStaffList } from "../../../hooks/useStaffList.js";
+import { usePagination } from "../../../hooks/usePagination.js";
 import { initialsFrom } from "../../../utils/initials.js";
 
-// Everything the two staff lists differ by. A third kind of staff means
-// another entry here, not another branch further down the file.
-const VIEWS = {
-  Doctors: {
-    kind: "doctor",
-    noun: "doctor",
-    role: "Doctor",
-    subtitle: "Clinicians taking appointments",
-    fetchList: listDoctors,
-    deactivate: deactivateDoctor,
-  },
-  Receptionists: {
-    kind: "receptionist",
-    noun: "receptionist",
-    role: "Receptionist",
-    subtitle: "Front desk and scheduling",
-    fetchList: listReceptionists,
-    deactivate: deactivateReceptionist,
-  },
-};
+const PAGE_SIZE = 8;
 
 function DashboardMain() {
-  const [activeTitle, setActiveTitle] = useState("Doctors");
-  const view = VIEWS[activeTitle];
+  // The tab lives in the URL, so a refresh keeps it and a colleague can be
+  // sent straight to the list being discussed.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const slug = searchParams.get("tab") ?? DEFAULT_VIEW_SLUG;
+  const view = findView(slug);
 
-  // One piece of state for the request, tagged with the view it belongs to.
-  // Staleness is worked out at render time by comparing title against the
-  // active tab, so the effect never has to reset it synchronously.
-  const [result, setResult] = useState({
-    title: null,
-    status: "loading",
-    items: [],
-    message: "",
-  });
-
-  // Bumped after a successful write to re-run the fetch, so the screen
-  // shows what the database holds rather than a locally patched array.
-  const [reloadToken, setReloadToken] = useState(0);
+  const { status, items, message, refresh } = useStaffList(view);
+  const {
+    page,
+    pageCount,
+    total,
+    pageItems,
+    rangeStart,
+    rangeEnd,
+    setPage,
+    reset,
+  } = usePagination(items, PAGE_SIZE);
 
   const [editing, setEditing] = useState(null);
   const [creating, setCreating] = useState(false);
@@ -64,54 +45,22 @@ function DashboardMain() {
   const [confirmError, setConfirmError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
-  // The id only exists to key the toast. Two identical messages in a row
-  // would otherwise reuse the element and inherit its remaining timer.
+  // Counter rather than a timestamp: two toasts raised in the same
+  // millisecond would share a key and the second would inherit the first
+  // one's remaining timer.
+  const toastId = useRef(0);
   const [toast, setToast] = useState(null);
-  const showToast = (message) => setToast({ id: Date.now(), message });
+  const showToast = (text) => {
+    toastId.current += 1;
+    setToast({ id: toastId.current, text });
+  };
 
-  useEffect(() => {
-    // "Deactivated users" has no endpoint yet.
-    if (!view) return undefined;
-
-    // StrictMode runs effects twice, and switching tabs quickly can leave
-    // an older request in flight.
-    let cancelled = false;
-
-    view
-      .fetchList()
-      .then((envelope) => {
-        if (cancelled) return;
-        setResult({
-          title: activeTitle,
-          status: "ready",
-          items: envelope.data ?? [],
-          message: "",
-        });
-      })
-      .catch((requestError) => {
-        if (cancelled) return;
-        // A 401 never lands here: the interceptor in client.js signs the
-        // user out first.
-        setResult({
-          title: activeTitle,
-          status: "error",
-          items: [],
-          message: readApiError(requestError),
-        });
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [view, activeTitle, reloadToken]);
-
-  // Data from another tab counts as no data. A refetch of the same tab
-  // keeps its rows on screen instead of flashing back to "Loading".
-  const isCurrent = result.title === activeTitle;
-  const status = isCurrent ? result.status : "loading";
-  const staff = isCurrent ? result.items : [];
-
-  const refresh = () => setReloadToken((token) => token + 1);
+  const selectView = (nextSlug) => {
+    setSearchParams({ tab: nextSlug }, { replace: true });
+    // Both belong to the list they were made in.
+    setSelectedId(null);
+    reset();
+  };
 
   const closeConfirm = () => {
     setConfirming(null);
@@ -131,17 +80,18 @@ function DashboardMain() {
       setConfirming(null);
       showToast(`${target.full_name} was deactivated successfully.`);
       refresh();
-    } catch (requestError) {
-      setConfirmError(readApiError(requestError));
+    } catch (error) {
+      setConfirmError(readApiError(error));
     } finally {
       setConfirmBusy(false);
     }
   };
 
+  const isList = Boolean(view?.fetchList);
   const count =
     status === "loading"
       ? "Loading…"
-      : `${staff.length} record${staff.length === 1 ? "" : "s"}`;
+      : `${total} record${total === 1 ? "" : "s"}`;
 
   return (
     <div className="relative min-h-screen bg-porcelain">
@@ -154,24 +104,20 @@ function DashboardMain() {
         <DashboardHeader />
 
         <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <ManagePanel
-            activeTitle={activeTitle}
-            onSelect={(title) => {
-              setActiveTitle(title);
-              setSelectedId(null);
-            }}
-          />
+          <ManagePanel activeSlug={view?.slug} onSelect={selectView} />
 
           <section className="min-w-0">
             <SectionHeader
-              title={activeTitle}
-              subtitle={view?.subtitle ?? "Accounts without access"}
-              count={view ? count : ""}
+              title={view?.title ?? "Not found"}
+              subtitle={view?.subtitle ?? ""}
+              count={isList ? count : ""}
               action={
-                view && (
+                isList && (
                   <Button
                     variant="primary"
-                    leadingIcon={<Plus className="size-4.5" strokeWidth={2.25} />}
+                    leadingIcon={
+                      <Plus className="size-4.5" strokeWidth={2.25} />
+                    }
                     onClick={() => setCreating(true)}
                   >
                     Add {view.noun}
@@ -181,72 +127,88 @@ function DashboardMain() {
             />
 
             <div className="mt-5 space-y-4">
-              {!view && (
+              {view?.unavailable && (
                 <p className="font-primary text-sm leading-body text-muted">
-                  Deactivated staff cannot be listed yet. The API endpoint for
-                  this view has not been built.
+                  {view.unavailable}
                 </p>
               )}
 
-              {view && status === "error" && <Alert>{result.message}</Alert>}
+              {isList && status === "error" && <Alert>{message}</Alert>}
 
-              {view && status === "loading" && (
+              {isList && status === "loading" && (
                 <p className="font-primary text-sm text-muted">
                   Loading {view.noun}s…
                 </p>
               )}
 
-              {view && status === "ready" && staff.length === 0 && (
+              {isList && status === "ready" && total === 0 && (
                 <p className="font-primary text-sm text-muted">
                   No {view.noun}s yet. Add one to get started.
                 </p>
               )}
 
-              {/* API field names are mapped here so StaffCard stays
-                  presentation and never sees the backend's vocabulary */}
-              {view &&
-                status === "ready" &&
-                staff.map((member) => (
-                  <StaffCard
-                    key={member.id}
-                    initials={initialsFrom(member.full_name)}
-                    name={member.full_name}
-                    specialty={member.specialization}
-                    role={view.role}
-                    email={member.email}
-                    selected={member.id === selectedId}
-                    onSelect={() =>
-                      setSelectedId((current) =>
-                        current === member.id ? null : member.id,
-                      )
-                    }
-                    onEdit={() => setEditing(member)}
-                    onDeactivate={() => setConfirming(member)}
+              {isList && status === "ready" && total > 0 && (
+                <>
+                  {/* API field names are mapped here so StaffCard stays
+                      presentation and never sees the backend's vocabulary */}
+                  <div
+                    role="listbox"
+                    aria-label={view.title}
+                    className="space-y-4"
+                  >
+                    {pageItems.map((member) => (
+                      <StaffCard
+                        key={member.id}
+                        initials={initialsFrom(member.full_name)}
+                        name={member.full_name}
+                        specialty={member.specialization}
+                        role={view.role}
+                        email={member.email}
+                        selected={member.id === selectedId}
+                        onSelect={() =>
+                          setSelectedId((current) =>
+                            current === member.id ? null : member.id,
+                          )
+                        }
+                        onEdit={() => setEditing(member)}
+                        onDeactivate={() => setConfirming(member)}
+                      />
+                    ))}
+                  </div>
+
+                  <Pagination
+                    page={page}
+                    pageCount={pageCount}
+                    total={total}
+                    rangeStart={rangeStart}
+                    rangeEnd={rangeEnd}
+                    onChange={setPage}
                   />
-                ))}
+                </>
+              )}
             </div>
           </section>
         </div>
       </div>
 
-      {creating && view && (
+      {creating && isList && (
         <StaffFormModal
           kind={view.kind}
           onClose={() => setCreating(false)}
-          onSaved={(message) => {
+          onSaved={(text) => {
             setCreating(false);
-            showToast(message || `The ${view.noun} was added successfully.`);
+            showToast(text || `The ${view.noun} was added successfully.`);
             refresh();
           }}
         />
       )}
 
-      {editing && view && (
+      {editing && isList && (
         <StaffFormModal
           staff={editing}
           kind={view.kind}
           onClose={() => setEditing(null)}
-          onSaved={(message, saved) => {
+          onSaved={(text, saved) => {
             setEditing(null);
             // The name just typed, not the one the list still holds.
             showToast(`${saved.full_name}'s fields updated successfully.`);
@@ -255,7 +217,7 @@ function DashboardMain() {
         />
       )}
 
-      {confirming && view && (
+      {confirming && isList && (
         <ConfirmDialog
           title={`Deactivate ${view.noun}`}
           message={`Are you sure you want to deactivate ${confirming.full_name}? They lose access immediately, but the record is kept and can be reactivated later.`}
@@ -270,7 +232,7 @@ function DashboardMain() {
       {toast && (
         <Toast
           key={toast.id}
-          message={toast.message}
+          message={toast.text}
           onDone={() => setToast(null)}
         />
       )}

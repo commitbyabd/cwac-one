@@ -1,13 +1,66 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import Card from "./Card.jsx";
 
-// Dialog shell. Owns the backdrop, Escape to close and the scroll lock;
-// the caller supplies the body and the footer.
-function Modal({ title, subtitle, onClose, children, width = "max-w-[520px]" }) {
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Dialog shell. Owns the backdrop, Escape to close, the scroll lock and
+// focus containment; the caller supplies the body and the footer.
+function Modal({
+  title,
+  subtitle,
+  onClose,
+  children,
+  width = "max-w-[520px]",
+}) {
+  const panelRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+
   useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    // Restored on close so the trigger does not lose its place in the page.
+    const previouslyFocused = document.activeElement;
+
+    const focusable = () =>
+      Array.from(panel?.querySelectorAll(FOCUSABLE) ?? []);
+
+    // The first field, or the panel itself when the dialog is only a
+    // message. Without this, focus stays behind the backdrop.
+    const first = focusable()[0];
+    if (first) first.focus();
+    else panel?.focus();
+
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        onCloseRef.current();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      // Tab must not reach the page behind the backdrop, so the ends of the
+      // list wrap into each other.
+      const items = focusable();
+      if (items.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstItem = items[0];
+      const lastItem = items[items.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstItem) {
+        event.preventDefault();
+        lastItem.focus();
+      } else if (!event.shiftKey && document.activeElement === lastItem) {
+        event.preventDefault();
+        firstItem.focus();
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -18,8 +71,9 @@ function Modal({ title, subtitle, onClose, children, width = "max-w-[520px]" }) 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus?.();
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -32,10 +86,12 @@ function Modal({ title, subtitle, onClose, children, width = "max-w-[520px]" }) 
       />
 
       <Card
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative w-full ${width} bg-porcelain/95 p-6 shadow-card backdrop-blur-card sm:p-7`}
+        tabIndex={-1}
+        className={`relative w-full ${width} bg-porcelain/95 p-6 shadow-card backdrop-blur-card outline-none sm:p-7`}
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">

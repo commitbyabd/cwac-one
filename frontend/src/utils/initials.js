@@ -1,23 +1,36 @@
+// Honorifics rather than names. Matched without the trailing dot, which is
+// stripped before the lookup.
 const TITLES = new Set([
   "dr",
-  "dr.",
   "mr",
-  "mr.",
   "mrs",
-  "mrs.",
   "ms",
-  "ms.",
+  "miss",
   "prof",
-  "prof.",
+  "sir",
+  "hafiz",
+  "hafiza",
+  "syed",
+  "syeda",
+  "mufti",
+  "qari",
+  "engr",
+  "adv",
 ]);
 
+const isTitle = (word) => TITLES.has(word.toLowerCase().replace(/\.$/, ""));
+
 // "Dr. Sara Khan" -> "SK". Titles are dropped first, or every clinician in
-// the list would share a "D".
+// the list would share a "D". A name that is nothing but titles keeps them,
+// since one letter beats a question mark.
 export function initialsFrom(fullName) {
-  const words = String(fullName ?? "")
+  const parts = String(fullName ?? "")
     .trim()
     .split(/\s+/)
-    .filter((word) => word && !TITLES.has(word.toLowerCase()));
+    .filter(Boolean);
+
+  const named = parts.filter((word) => !isTitle(word));
+  const words = named.length > 0 ? named : parts;
 
   if (words.length === 0) return "?";
 

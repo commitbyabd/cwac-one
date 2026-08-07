@@ -1,7 +1,9 @@
 import { Mail } from "lucide-react";
-import TextField from "../../ui/TextField.jsx";
-import IconBox from "../../ui/IconBox.jsx";
+import TextField from "./TextField.jsx";
+import IconBox from "./IconBox.jsx";
 
+// Email input with the shared icon treatment. Pass id, label or
+// autoComplete to reuse it outside the sign-in form.
 function EmailField({ error, ...props }) {
   return (
     <TextField

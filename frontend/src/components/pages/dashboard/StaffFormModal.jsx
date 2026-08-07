@@ -44,7 +44,9 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
   const mode = isCreate ? "add" : "edit";
 
   const schema =
-    SCHEMAS[isDoctor ? "doctor" : "receptionist"][isCreate ? "create" : "update"];
+    SCHEMAS[isDoctor ? "doctor" : "receptionist"][
+      isCreate ? "create" : "update"
+    ];
 
   const [values, setValues] = useState({
     full_name: staff?.full_name ?? "",

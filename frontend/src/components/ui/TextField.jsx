@@ -47,9 +47,12 @@ function TextField({
         {trailing && <span className="absolute right-2 flex">{trailing}</span>}
       </div>
 
+      {/* Announced when it appears: assertively once submit has failed,
+          politely while the form is still being filled in */}
       {error && (
         <p
           id={`${id}-error`}
+          role={tone === "error" ? "alert" : "status"}
           className={`mt-2 font-primary text-sm ${TONES[tone] ?? TONES.error}`}
         >
           {error}

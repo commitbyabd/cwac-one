@@ -5,7 +5,9 @@ function StaffInfo({ name, specialty, role, email }) {
   return (
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <p className="font-primary text-md-lg font-semibold text-plum">{name}</p>
+        <p className="font-primary text-md-lg font-semibold text-plum">
+          {name}
+        </p>
 
         {/* Receptionists have no specialization */}
         {specialty && (

@@ -1,26 +1,42 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoutes from "./ProtectedRoutes.jsx";
-import Signup from "../pages/sign-up/Signup.jsx";
-import Dashboard from "../pages/dashboard/Dashboard.jsx";
+import GuestRoutes from "./GuestRoutes.jsx";
+import RouteFallback from "./RouteFallback.jsx";
+import Login from "../pages/login/Login.jsx";
+import Forbidden from "../pages/Forbidden.jsx";
+import NotFound from "../pages/NotFound.jsx";
+import { useAuth } from "../context/authContext.js";
+
+// Split out so the login page does not ship the dashboard with it.
+const Dashboard = lazy(() => import("../pages/dashboard/Dashboard.jsx"));
+
+function RootRedirect() {
+  const { isAuthenticated } = useAuth();
+  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
+}
 
 // Route table for the whole app. Each element points at a page in
 // src/pages, never at a component directly.
 function ProjectRoutes() {
   return (
-    <Routes>
-      {/* No landing screen yet */}
-      <Route path="/" element={<Navigate to="/signup" replace />} />
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        <Route path="/" element={<RootRedirect />} />
 
-      <Route path="/signup" element={<Signup />} />
+        <Route element={<GuestRoutes />}>
+          <Route path="/login" element={<Login />} />
+        </Route>
 
-      {/* Pathless layout route: anything nested here is guarded by default */}
-      <Route element={<ProtectedRoutes />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Route>
+        {/* Pathless layout route: anything nested here is guarded by default */}
+        <Route element={<ProtectedRoutes roles={["admin"]} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
 
-      {/* TODO: replace with a NotFound page */}
-      <Route path="*" element={<Navigate to="/signup" replace />} />
-    </Routes>
+        <Route path="/forbidden" element={<Forbidden />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 }
 

@@ -1,6 +1,6 @@
 import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { readUser, clearSession } from "../../../api/auth.js";
+import { useAuth } from "../../../context/authContext.js";
 
 // Roles are stored lowercase; the header shows them the way a person
 // would write them.
@@ -9,16 +9,14 @@ const titleCase = (value) =>
 
 function HeaderUser() {
   const navigate = useNavigate();
+  const { user, role: sessionRole, signOut } = useAuth();
 
-  // Read from storage rather than props, so the header does not depend on
-  // every page passing the session down.
-  const user = readUser();
   const name = user?.full_name || "Signed in";
-  const role = titleCase(user?.role) || "Staff";
+  const role = titleCase(user?.role || sessionRole) || "Staff";
 
   const handleSignOut = () => {
-    clearSession();
-    navigate("/signup", { replace: true });
+    signOut();
+    navigate("/login", { replace: true });
   };
 
   return (

@@ -1,28 +1,11 @@
-import { Stethoscope, ConciergeBell, UserX } from "lucide-react";
 import Card from "../../ui/Card.jsx";
 import NavItem from "../../ui/NavItem.jsx";
+import { STAFF_VIEWS } from "../../../config/staffViews.js";
 
-const ITEMS = [
-  {
-    icon: Stethoscope,
-    title: "Doctors",
-    subtitle: "Clinicians taking appointments",
-  },
-  {
-    icon: ConciergeBell,
-    title: "Receptionists",
-    subtitle: "Front desk and scheduling",
-  },
-  {
-    icon: UserX,
-    title: "Deactivated users",
-    subtitle: "Accounts without access",
-  },
-];
-
-// Controlled: renders whichever item the parent says is active and reports
-// clicks back, rather than holding a selection the list must stay in sync with.
-function ManagePanel({ activeTitle = "Doctors", onSelect }) {
+// Controlled: renders whichever view the parent says is active and reports
+// clicks back, rather than holding a selection the list must stay in sync
+// with. The items come from the shared config, so wording lives in one file.
+function ManagePanel({ activeSlug, onSelect }) {
   return (
     <Card
       as="nav"
@@ -34,14 +17,14 @@ function ManagePanel({ activeTitle = "Doctors", onSelect }) {
       </p>
 
       <div className="mt-4 space-y-1">
-        {ITEMS.map((item) => (
+        {STAFF_VIEWS.map((view) => (
           <NavItem
-            key={item.title}
-            icon={item.icon}
-            title={item.title}
-            subtitle={item.subtitle}
-            active={item.title === activeTitle}
-            onClick={() => onSelect?.(item.title)}
+            key={view.slug}
+            icon={view.icon}
+            title={view.title}
+            subtitle={view.subtitle}
+            active={view.slug === activeSlug}
+            onClick={() => onSelect?.(view.slug)}
           />
         ))}
       </div>

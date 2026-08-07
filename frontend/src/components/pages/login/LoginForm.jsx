@@ -1,18 +1,22 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import EmailField from "./EmailField.jsx";
+import EmailField from "../../ui/EmailField.jsx";
 import PasswordField from "../../ui/PasswordField.jsx";
 import Button from "../../ui/Button.jsx";
 import IconBox from "../../ui/IconBox.jsx";
 import Alert from "../../ui/Alert.jsx";
-import { login, saveToken, saveUser, readApiError } from "../../../api/auth.js";
+import { login, readApiError } from "../../../api/auth.js";
+import { useAuth } from "../../../context/authContext.js";
 import { userLoginSchema } from "../../../schemas/auth.js";
 import { validateField, validateWith } from "../../../schemas/validate.js";
 
-// Owns the form state and the sign-in call; SignupMain stays layout only.
+// Owns the form state and the sign-in call; LoginMain stays layout only.
 function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn } = useAuth();
+
   const [values, setValues] = useState({ email: "", password: "" });
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -53,13 +57,18 @@ function LoginForm() {
     setSubmitting(true);
     try {
       const data = await login(credentials);
-      const token = data?.access_token ?? data?.token;
-      if (token) saveToken(token);
 
-      // Name and role are only sent here, so cache them for the header.
-      saveUser({ full_name: data?.full_name ?? "", role: data?.role ?? "" });
+      // Name and role are only sent on this call, so they are cached for
+      // the header rather than re-fetched on every screen.
+      signIn({
+        token: data?.access_token ?? data?.token ?? "",
+        user: { full_name: data?.full_name ?? "", role: data?.role ?? "" },
+      });
 
-      navigate("/dashboard");
+      // Where the guard interrupted them, if it did.
+      navigate(location.state?.from?.pathname ?? "/dashboard", {
+        replace: true,
+      });
     } catch (error) {
       setFormError(readApiError(error));
     } finally {

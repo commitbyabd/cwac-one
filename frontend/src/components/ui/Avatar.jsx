@@ -1,5 +1,10 @@
 // Initials avatar. Surface colour comes from the caller.
-function Avatar({ initials, size = "size-14", radius = "rounded-lg", className = "" }) {
+function Avatar({
+  initials,
+  size = "size-14",
+  radius = "rounded-lg",
+  className = "",
+}) {
   return (
     <span
       aria-hidden="true"

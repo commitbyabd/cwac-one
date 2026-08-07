@@ -5,8 +5,23 @@ import axios from "axios";
 export const TOKEN_KEY = "cwac_token";
 export const USER_KEY = "cwac_user";
 
+/*
+  A production build with no VITE_API_BASE_URL falls back to the origin it
+  is served from, not to localhost: a deployed bundle pointing at a
+  developer's machine fails in a way nobody notices until a user reports it.
+*/
+function resolveBaseUrl() {
+  const configured = import.meta.env.VITE_API_BASE_URL;
+  if (configured) return configured;
+
+  if (import.meta.env.DEV) return "http://localhost:8000";
+
+  console.warn("VITE_API_BASE_URL is not set. Falling back to same-origin.");
+  return "/";
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000",
+  baseURL: resolveBaseUrl(),
   headers: { "Content-Type": "application/json" },
   timeout: 15000,
 });
@@ -34,8 +49,8 @@ api.interceptors.response.use(
 
       // Full page load rather than a router navigation: this module sits
       // outside the React tree, so useNavigate is unavailable.
-      if (window.location.pathname !== "/signup") {
-        window.location.replace("/signup");
+      if (window.location.pathname !== "/login") {
+        window.location.replace("/login");
       }
     }
 

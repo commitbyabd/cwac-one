@@ -38,6 +38,8 @@ export function clearSession() {
   localStorage.removeItem(USER_KEY);
 }
 
+const GENERIC = "Something went wrong. Please try again.";
+
 /*
   Reduces an axios failure to one readable sentence.
 
@@ -47,7 +49,12 @@ export function clearSession() {
   because its message is written for the user.
 */
 export function readApiError(error) {
+  const status = error?.response?.status;
   const body = error?.response?.data;
+
+  // A 5xx body describes a fault, not something the user can act on, and
+  // may carry internal detail. Only 4xx text is meant to be read.
+  if (status >= 500) return GENERIC;
 
   if (typeof body?.message === "string") return body.message;
 
@@ -60,5 +67,5 @@ export function readApiError(error) {
     return "The server took too long to respond. Please try again.";
   }
 
-  return "Something went wrong. Please try again.";
+  return GENERIC;
 }
