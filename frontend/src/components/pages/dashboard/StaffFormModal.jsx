@@ -189,7 +189,7 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
           {isCreate && (
             <PasswordField
               id={`${mode}-password`}
-              label="Temporary password"
+              label="Password"
               placeholder="At least 8 characters"
               autoComplete="new-password"
               value={values.password}
