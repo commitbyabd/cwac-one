@@ -2,21 +2,16 @@ import { useEffect, useRef } from "react";
 import { Check } from "lucide-react";
 
 /*
-  Transient success message. It appears, announces itself, and leaves on
-  its own — there is nothing to dismiss, because it never blocks anything.
+  Transient success message. The parent decides when a toast exists; this
+  only reports when it is finished.
 
-  Deliberately stateless: the parent decides whether a toast exists, and
-  this component only says when it is finished. Give it a React key that
-  changes per message, so a second toast remounts and restarts the clock
-  instead of inheriting whatever was left of the first one's.
+  Give it a key that changes per message so a second toast remounts with a
+  fresh timer instead of inheriting what was left of the first one's.
 */
 function Toast({ message, duration = 2000, onDone }) {
-  /*
-    onDone is kept in a ref so the timer below depends only on 'duration'.
-    Parents usually pass an inline arrow, which is a new function on every
-    render — as a dependency it would restart the countdown each time the
-    dashboard re-rendered, and the toast could hang around indefinitely.
-  */
+  // Held in a ref so the timer depends on duration alone. Parents pass an
+  // inline arrow, and as a dependency that would restart the countdown on
+  // every parent render.
   const onDoneRef = useRef(onDone);
 
   useEffect(() => {
@@ -31,7 +26,6 @@ function Toast({ message, duration = 2000, onDone }) {
   return (
     <div
       role="status"
-      aria-live="polite"
       className="fixed inset-x-0 bottom-6 z-60 flex justify-center px-4"
     >
       <div className="flex items-center gap-3 rounded-pill bg-plum px-5 py-3 font-primary text-sm font-medium text-white shadow-card">

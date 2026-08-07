@@ -1,7 +1,4 @@
-/*
-  Icon + title + subtitle navigation row with an active state.
-  Generic enough that any future sidebar can reuse it.
-*/
+// Icon + title + subtitle navigation row with an active state.
 function NavItem({ icon: Icon, title, subtitle, active = false, ...rest }) {
   return (
     <button

@@ -2,14 +2,8 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import Card from "./Card.jsx";
 
-/*
-  Dialog shell. Owns the behaviour every modal needs — backdrop, Escape to
-  close, and locking the page behind it — while the caller supplies the
-  body and the footer.
-
-  The surface is the login card's recipe (porcelain, blur, shadow-card) so
-  a dialog reads as the same material as the rest of the app.
-*/
+// Dialog shell. Owns the backdrop, Escape to close and the scroll lock;
+// the caller supplies the body and the footer.
 function Modal({ title, subtitle, onClose, children, width = "max-w-[520px]" }) {
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -18,7 +12,6 @@ function Modal({ title, subtitle, onClose, children, width = "max-w-[520px]" }) 
 
     document.addEventListener("keydown", handleKeyDown);
 
-    // Stop the dashboard scrolling underneath the dialog.
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
@@ -30,10 +23,8 @@ function Modal({ title, subtitle, onClose, children, width = "max-w-[520px]" }) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/*
-        The backdrop is a sibling, not a parent, so a click inside the panel
-        never bubbles out to it and closes the dialog by accident.
-      */}
+      {/* Sibling of the panel, not its parent, so a click inside the dialog
+          never bubbles out and closes it */}
       <div
         aria-hidden="true"
         onClick={onClose}

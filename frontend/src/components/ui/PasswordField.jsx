@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Lock, Eye, EyeOff } from "lucide-react";
-import TextField from "../../ui/TextField.jsx";
-import IconBox from "../../ui/IconBox.jsx";
+import TextField from "./TextField.jsx";
+import IconBox from "./IconBox.jsx";
 
+// Password input with a visibility toggle. Defaults suit a sign-in form;
+// pass id, label, placeholder or autoComplete to reuse it elsewhere.
 function PasswordField({ error, ...props }) {
   const [visible, setVisible] = useState(false);
 

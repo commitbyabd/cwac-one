@@ -1,18 +1,18 @@
 import Card from "../../ui/Card.jsx";
 import Avatar from "../../ui/Avatar.jsx";
-import DoctorInfo from "./DoctorInfo.jsx";
-import DoctorActions from "./DoctorActions.jsx";
+import StaffInfo from "./StaffInfo.jsx";
+import StaffActions from "./StaffActions.jsx";
 
 /*
-  One staff row. Serves doctors and receptionists alike — 'specialty' is
-  simply absent for the latter.
+  One staff row, for doctors and receptionists alike: specialty is simply
+  absent for the latter.
 
-  Presentation only: it is handed plain strings and callbacks, and knows
-  nothing about the API's field names. 'selected' is passed in rather than
-  held here, because only one card in the list may be selected at a time
-  and no card can know what the others are doing.
+  Presentation only. It receives plain strings and callbacks and knows
+  nothing about the API's field names. 'selected' is a prop rather than
+  local state because only one row may be selected and no row can know
+  what the others are doing.
 */
-function DoctorCard({
+function StaffCard({
   initials,
   name,
   specialty,
@@ -24,11 +24,8 @@ function DoctorCard({
   onDeactivate,
 }) {
   return (
-    /*
-      Clicks on Edit and Deactivate bubble up to here and select the card
-      too. That is intentional: acting on a card is a stronger statement of
-      "this one" than clicking it, so the highlight should follow.
-    */
+    // Clicks on the action buttons bubble up and select the row too, which
+    // is intended: acting on a row is a stronger "this one" than clicking it.
     <Card
       onClick={onSelect}
       aria-current={selected ? "true" : undefined}
@@ -41,7 +38,7 @@ function DoctorCard({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="flex min-w-0 items-center gap-4">
           <Avatar initials={initials} className="bg-seafoam/60" />
-          <DoctorInfo
+          <StaffInfo
             name={name}
             specialty={specialty}
             role={role}
@@ -49,7 +46,7 @@ function DoctorCard({
           />
         </div>
 
-        <DoctorActions
+        <StaffActions
           name={name}
           onEdit={onEdit}
           onDeactivate={onDeactivate}
@@ -59,4 +56,4 @@ function DoctorCard({
   );
 }
 
-export default DoctorCard;
+export default StaffCard;

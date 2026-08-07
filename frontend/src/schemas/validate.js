@@ -1,17 +1,13 @@
 /*
-  Runs a Zod schema against a form's values and returns something a form
-  can use directly.
+  Adapters between Zod and the shape a form needs.
 
-  Zod reports every problem it finds, and reports them as a flat list of
-  issues carrying a path. A form needs the opposite shape — one message per
-  field, keyed by field name — so this flattens the list and keeps the first
-  message per field, since each input shows a single line beneath it.
-
-  The parsed data comes back too, and it is the thing worth sending: Zod
-  applies the schema's transforms (trimming, mostly) and drops any key the
-  schema does not declare. So a receptionist payload loses 'specialization'
-  and an edit payload loses 'password' without anyone writing that by hand.
+  Zod reports a flat list of issues carrying a path; a form wants one
+  message per field, keyed by field name.
 */
+
+// Returns { valid, data, errors }. The parsed data is what should be sent:
+// Zod applies the schema's transforms and drops undeclared keys, so a
+// receptionist payload loses specialization and an edit loses password.
 export function validateWith(schema, values) {
   const result = schema.safeParse(values);
 
@@ -29,17 +25,9 @@ export function validateWith(schema, values) {
   return { valid: false, data: null, errors };
 }
 
-/*
-  Checks one field of an object schema, for validating as the user leaves an
-  input rather than waiting for submit.
-
-  z.object exposes its fields on .shape, so the field's own schema can be
-  pulled out and parsed alone. A name the schema does not declare returns no
-  message — that is not a failure, it just means the schema has no opinion
-  about that input, the way the update schemas have none about 'password'.
-
-  Returns the message, or an empty string when the field is fine.
-*/
+// Checks one field, for validating on blur. A name the schema does not
+// declare returns no message, so blurring password on an edit form is
+// silent.
 export function validateField(schema, name, value) {
   const fieldSchema = schema.shape?.[name];
   if (!fieldSchema) return "";

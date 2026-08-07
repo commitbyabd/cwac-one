@@ -1,7 +1,4 @@
-/*
-  Form-level message. role="alert" so screen readers announce it
-  the moment it appears.
-*/
+// Form-level error. role="alert" so it is announced as soon as it appears.
 function Alert({ children, className = "" }) {
   return (
     <p

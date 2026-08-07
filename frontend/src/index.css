@@ -2,12 +2,8 @@
 @import "./fonts.css";
 @import "./variables.css";
 
-/*
-  A looping animation is the kind of motion that triggers discomfort for
-  people who have asked their system to reduce it. The selection still
-  reads clearly without it — the violet border and tinted surface carry
-  the meaning on their own.
-*/
+/* The border and tint carry the selected state on their own, so the loop
+   can be dropped for anyone who has asked for less motion. */
 @media (prefers-reduced-motion: reduce) {
   .animate-selected-pulse {
     animation: none;

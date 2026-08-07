@@ -5,7 +5,7 @@ import Button from "../../ui/Button.jsx";
 import Alert from "../../ui/Alert.jsx";
 import TextField from "../../ui/TextField.jsx";
 import IconBox from "../../ui/IconBox.jsx";
-import PasswordField from "../sign-up/PasswordField.jsx";
+import PasswordField from "../../ui/PasswordField.jsx";
 import {
   createDoctor,
   createReceptionist,
@@ -21,19 +21,6 @@ import {
 } from "../../../schemas/staff.js";
 import { validateField, validateWith } from "../../../schemas/validate.js";
 
-/*
-  One dialog for adding and editing staff.
-
-  Two axes, four combinations, no duplication:
-    - 'kind'  decides doctor or receptionist — which endpoint is called and
-      whether specialization is asked for.
-    - 'staff' decides add or edit — pass a record to edit it, pass nothing
-      to create a new one.
-
-  The rules live in src/schemas/staff.js, which mirrors the Pydantic models.
-  They are checked here only to spare the user a round trip; the server still
-  validates, and a rejection surfaces through readApiError.
-*/
 const SCHEMAS = {
   doctor: { create: doctorCreateSchema, update: doctorUpdateSchema },
   receptionist: {
@@ -42,6 +29,14 @@ const SCHEMAS = {
   },
 };
 
+/*
+  One dialog for adding and editing staff, along two independent axes:
+  'kind' picks doctor or receptionist, 'staff' picks edit or add. Pass a
+  record to edit it, pass nothing to create one.
+
+  Client-side rules exist only to spare a round trip. The server validates
+  regardless, and a rejection surfaces through readApiError.
+*/
 function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
   const isDoctor = kind === "doctor";
   const isCreate = staff === null;
@@ -61,12 +56,8 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  /*
-    How loudly to report a problem. Before the first submit the user is
-    still working, so a message is guidance and shows in the calm hint
-    colour. Once they have pressed the button, the same message is the
-    reason nothing happened, and red is the honest colour for that.
-  */
+  // Before the first submit a message is guidance; afterwards it is the
+  // reason nothing happened.
   const [submitted, setSubmitted] = useState(false);
   const tone = submitted ? "error" : "hint";
 
@@ -76,8 +67,6 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
     setFieldErrors((current) => ({ ...current, [name]: "" }));
   };
 
-  // Checked on the way out of a field, so a mistake is caught next to the
-  // input the user just left rather than at the bottom of the form later.
   const handleBlur = (event) => {
     const { name, value } = event.target;
     setFieldErrors((current) => ({
@@ -91,12 +80,8 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
     setFormError("");
     setSubmitted(true);
 
-    /*
-      The parsed data is the payload. The schema has already trimmed what
-      should be trimmed and dropped every key it does not declare — so a
-      receptionist loses 'specialization' and an edit loses 'password'
-      without this function knowing either rule.
-    */
+    // The parsed data is the payload: the schema has trimmed what needs
+    // trimming and dropped every key it does not declare.
     const { valid, data: payload, errors } = validateWith(schema, values);
     setFieldErrors(errors);
     if (!valid) return;
@@ -115,14 +100,11 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
           : await updateReceptionist(staff.id, payload);
       }
 
-      /*
-        The parent refetches; it owns the list, not this dialog. The payload
-        goes back with the message because the name in it is the new one —
-        the parent's copy of the record still holds the name before the edit.
-      */
+      // The payload goes back with the message because the name in it is
+      // the new one; the parent's copy still holds the name before the edit.
       onSaved(envelope.message, payload);
     } catch (error) {
-      // A duplicate email lands here as a 409 with a readable message.
+      // A duplicate email arrives here as a 409 with a readable message.
       setFormError(readApiError(error));
       setSaving(false);
     }
@@ -200,6 +182,8 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
             />
           )}
 
+          {/* Only asked for at creation: there is no change-password
+              endpoint, and PATCH ignores the field */}
           {isCreate && (
             <PasswordField
               id={`${mode}-password`}

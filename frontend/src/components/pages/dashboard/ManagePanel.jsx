@@ -20,11 +20,8 @@ const ITEMS = [
   },
 ];
 
-/*
-  The sidebar is a controlled component: it renders whichever item the
-  parent says is active and reports clicks back, rather than tracking a
-  selection the list would then have to stay in sync with.
-*/
+// Controlled: renders whichever item the parent says is active and reports
+// clicks back, rather than holding a selection the list must stay in sync with.
 function ManagePanel({ activeTitle = "Doctors", onSelect }) {
   return (
     <Card

@@ -1,13 +1,13 @@
 import { Mail } from "lucide-react";
 import Badge from "../../ui/Badge.jsx";
 
-function DoctorInfo({ name, specialty, role, email }) {
+function StaffInfo({ name, specialty, role, email }) {
   return (
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <p className="font-primary text-md-lg font-semibold text-plum">{name}</p>
 
-        {/* Receptionists have no specialization, so the badge is optional. */}
+        {/* Receptionists have no specialization */}
         {specialty && (
           <Badge
             dot={false}
@@ -28,4 +28,4 @@ function DoctorInfo({ name, specialty, role, email }) {
   );
 }
 
-export default DoctorInfo;
+export default StaffInfo;

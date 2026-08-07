@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import DashboardHeader from "./DashboardHeader.jsx";
 import ManagePanel from "./ManagePanel.jsx";
 import SectionHeader from "./SectionHeader.jsx";
-import DoctorCard from "./DoctorCard.jsx";
+import StaffCard from "./StaffCard.jsx";
 import StaffFormModal from "./StaffFormModal.jsx";
 import ConfirmDialog from "../../ui/ConfirmDialog.jsx";
 import Alert from "../../ui/Alert.jsx";
@@ -18,15 +18,13 @@ import {
 import { readApiError } from "../../../api/auth.js";
 import { initialsFrom } from "../../../utils/initials.js";
 
-/*
-  Everything the two staff lists differ by, in one place. Adding a third
-  kind of staff means adding an entry here, not another branch further
-  down the file.
-*/
+// Everything the two staff lists differ by. A third kind of staff means
+// another entry here, not another branch further down the file.
 const VIEWS = {
   Doctors: {
     kind: "doctor",
     noun: "doctor",
+    role: "Doctor",
     subtitle: "Clinicians taking appointments",
     fetchList: listDoctors,
     deactivate: deactivateDoctor,
@@ -34,6 +32,7 @@ const VIEWS = {
   Receptionists: {
     kind: "receptionist",
     noun: "receptionist",
+    role: "Receptionist",
     subtitle: "Front desk and scheduling",
     fetchList: listReceptionists,
     deactivate: deactivateReceptionist,
@@ -44,12 +43,9 @@ function DashboardMain() {
   const [activeTitle, setActiveTitle] = useState("Doctors");
   const view = VIEWS[activeTitle];
 
-  /*
-    One piece of state for the whole request, tagged with the view it
-    belongs to. Keeping them together means the effect never has to set
-    state synchronously to reset the previous tab's data — staleness is
-    worked out at render time by comparing 'title' against the active tab.
-  */
+  // One piece of state for the request, tagged with the view it belongs to.
+  // Staleness is worked out at render time by comparing title against the
+  // active tab, so the effect never has to reset it synchronously.
   const [result, setResult] = useState({
     title: null,
     status: "loading",
@@ -57,45 +53,28 @@ function DashboardMain() {
     message: "",
   });
 
-  /*
-    Bumped after a successful edit or deactivation to re-run the fetch.
-    Cheaper to reason about than editing the local array by hand, and it
-    guarantees the screen shows what the database actually holds.
-  */
+  // Bumped after a successful write to re-run the fetch, so the screen
+  // shows what the database holds rather than a locally patched array.
   const [reloadToken, setReloadToken] = useState(0);
 
-  /*
-    'editing' holds the record being edited; 'creating' is a plain flag
-    because a new record has nothing to hold yet. Both feed the same
-    dialog — StaffFormModal treats a missing record as "add".
-  */
   const [editing, setEditing] = useState(null);
   const [creating, setCreating] = useState(false);
   const [confirming, setConfirming] = useState(null);
   const [confirmBusy, setConfirmBusy] = useState(false);
   const [confirmError, setConfirmError] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
 
-  /*
-    The id exists only to give the toast a fresh React key. Two identical
-    messages in a row would otherwise reuse the same element, and the
-    second one would inherit whatever was left of the first one's timer.
-  */
+  // The id only exists to key the toast. Two identical messages in a row
+  // would otherwise reuse the element and inherit its remaining timer.
   const [toast, setToast] = useState(null);
   const showToast = (message) => setToast({ id: Date.now(), message });
 
-  // Which card is highlighted. Stored as an id rather than the record, so a
-  // refetch cannot leave a stale copy of a row selected.
-  const [selectedId, setSelectedId] = useState(null);
-
   useEffect(() => {
-    // "Deactivated users" has no endpoint yet, so there is nothing to load.
+    // "Deactivated users" has no endpoint yet.
     if (!view) return undefined;
 
-    /*
-      StrictMode runs effects twice in development, and switching tabs
-      quickly can leave an older request in flight. The flag makes any late
-      reply a no-op instead of overwriting the newer list.
-    */
+    // StrictMode runs effects twice, and switching tabs quickly can leave
+    // an older request in flight.
     let cancelled = false;
 
     view
@@ -111,8 +90,8 @@ function DashboardMain() {
       })
       .catch((requestError) => {
         if (cancelled) return;
-        // A 401 never reaches here as an error the user sees — the response
-        // interceptor in client.js signs them out first.
+        // A 401 never lands here: the interceptor in client.js signs the
+        // user out first.
         setResult({
           title: activeTitle,
           status: "error",
@@ -126,11 +105,8 @@ function DashboardMain() {
     };
   }, [view, activeTitle, reloadToken]);
 
-  /*
-    Data from a different tab is treated as no data at all. A refetch of the
-    same tab keeps the old rows on screen instead of flashing back to
-    "Loading…", which would make every save look like a page reload.
-  */
+  // Data from another tab counts as no data. A refetch of the same tab
+  // keeps its rows on screen instead of flashing back to "Loading".
   const isCurrent = result.title === activeTitle;
   const status = isCurrent ? result.status : "loading";
   const staff = isCurrent ? result.items : [];
@@ -146,8 +122,8 @@ function DashboardMain() {
     setConfirmBusy(true);
     setConfirmError("");
 
-    // Held onto now, because the dialog is closed before the toast is shown
-    // and 'confirming' is null by then.
+    // Captured before the dialog closes, since confirming is null by the
+    // time the toast is shown.
     const target = confirming;
 
     try {
@@ -156,7 +132,6 @@ function DashboardMain() {
       showToast(`${target.full_name} was deactivated successfully.`);
       refresh();
     } catch (requestError) {
-      // Kept open so the message lands where the user is looking.
       setConfirmError(readApiError(requestError));
     } finally {
       setConfirmBusy(false);
@@ -183,7 +158,6 @@ function DashboardMain() {
             activeTitle={activeTitle}
             onSelect={(title) => {
               setActiveTitle(title);
-              // A selection belongs to the list it was made in.
               setSelectedId(null);
             }}
           />
@@ -197,9 +171,7 @@ function DashboardMain() {
                 view && (
                   <Button
                     variant="primary"
-                    leadingIcon={
-                      <Plus className="size-4.5" strokeWidth={2.25} />
-                    }
+                    leadingIcon={<Plus className="size-4.5" strokeWidth={2.25} />}
                     onClick={() => setCreating(true)}
                   >
                     Add {view.noun}
@@ -211,8 +183,8 @@ function DashboardMain() {
             <div className="mt-5 space-y-4">
               {!view && (
                 <p className="font-primary text-sm leading-body text-muted">
-                  Deactivated staff cannot be listed yet — the API endpoint
-                  for this view has not been built.
+                  Deactivated staff cannot be listed yet. The API endpoint for
+                  this view has not been built.
                 </p>
               )}
 
@@ -230,24 +202,19 @@ function DashboardMain() {
                 </p>
               )}
 
-              {/*
-                API field names are mapped here rather than inside the card,
-                so DoctorCard stays presentation and knows nothing about the
-                backend's vocabulary.
-              */}
+              {/* API field names are mapped here so StaffCard stays
+                  presentation and never sees the backend's vocabulary */}
               {view &&
                 status === "ready" &&
                 staff.map((member) => (
-                  <DoctorCard
+                  <StaffCard
                     key={member.id}
                     initials={initialsFrom(member.full_name)}
                     name={member.full_name}
                     specialty={member.specialization}
-                    role={view.kind === "doctor" ? "Doctor" : "Receptionist"}
+                    role={view.role}
                     email={member.email}
                     selected={member.id === selectedId}
-                    // Clicking the highlighted card again clears it, so a
-                    // selection is never something you are stuck with.
                     onSelect={() =>
                       setSelectedId((current) =>
                         current === member.id ? null : member.id,
@@ -268,29 +235,27 @@ function DashboardMain() {
           onClose={() => setCreating(false)}
           onSaved={(message) => {
             setCreating(false);
-            // The server's own wording, so the confirmation matches what
-            // actually happened rather than what the UI assumed.
             showToast(message || `The ${view.noun} was added successfully.`);
             refresh();
           }}
         />
       )}
 
-      {editing && (
+      {editing && view && (
         <StaffFormModal
           staff={editing}
           kind={view.kind}
           onClose={() => setEditing(null)}
           onSaved={(message, saved) => {
             setEditing(null);
-            // The name they just typed, not the one the list still holds.
+            // The name just typed, not the one the list still holds.
             showToast(`${saved.full_name}'s fields updated successfully.`);
             refresh();
           }}
         />
       )}
 
-      {confirming && (
+      {confirming && view && (
         <ConfirmDialog
           title={`Deactivate ${view.noun}`}
           message={`Are you sure you want to deactivate ${confirming.full_name}? They lose access immediately, but the record is kept and can be reactivated later.`}

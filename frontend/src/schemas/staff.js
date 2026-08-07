@@ -1,35 +1,25 @@
 import { z } from "zod";
 
 /*
-  The client-side mirror of the staff schemas in app/schemas/.
+  Client-side mirror of the staff models in app/schemas/. Every rule here
+  matches a Field(...) constraint on the server, so a changed limit needs
+  one edit in this file. The server still validates and still wins.
 
-  Every rule here matches a Field(...) constraint on the server, so this file
-  is the one place to look when a backend limit changes. Nothing enforces the
-  match automatically — the server still validates and still wins — but the
-  rules are at least written down once instead of scattered through the form
-  as hand-written ifs.
-
-    doctorCreate       → DoctorCreate       (app/schemas/doctor_create.py)
-    doctorUpdate       → DoctorUpdate       (app/schemas/doctor_update.py)
-    receptionistCreate → ReceptionistCreate (app/schemas/receptionist_create.py)
-    receptionistUpdate → ReceptionistUpdate (app/schemas/receptionist_update.py)
+    doctorCreate       -> DoctorCreate
+    doctorUpdate       -> DoctorUpdate
+    receptionistCreate -> ReceptionistCreate
+    receptionistUpdate -> ReceptionistUpdate
 */
 
-// Field(..., min_length=2, max_length=100)
 const fullName = z
   .string()
   .trim()
   .min(2, "Full name must be at least 2 characters.")
   .max(100, "Full name cannot be longer than 100 characters.");
 
-/*
-  EmailStr = Field(..., max_length=254) — the RFC 5321 limit.
-
-  The trim has to happen in a separate step piped into the format check,
-  not chained after it. Zod runs checks in the order they are written, so
-  z.email().trim() would test " sara@clinic.com " for validity while the
-  spaces are still attached and reject a perfectly good pasted address.
-*/
+// Trim in a separate step piped into the format check. Zod runs checks in
+// order, so z.email().trim() would reject a pasted " name@clinic.com "
+// before the spaces were removed.
 const email = z
   .string()
   .trim()
@@ -39,21 +29,15 @@ const email = z
       .max(254, "Email address cannot be longer than 254 characters."),
   );
 
-// Field(..., min_length=2, max_length=100)
 const specialization = z
   .string()
   .trim()
   .min(2, "Specialization must be at least 2 characters.")
   .max(100, "Specialization cannot be longer than 100 characters.");
 
-/*
-  SecretStr = Field(..., min_length=8, max_length=64)
-
-  Never trimmed, unlike every field above: leading and trailing spaces are
-  legitimate password characters, and the hash has to match what was typed.
-  The 64 ceiling is the server's, and it exists because bcrypt ignores
-  anything past 72 bytes.
-*/
+// Never trimmed: spaces are legitimate password characters and the hash
+// has to match what was typed. The 64 ceiling is the server's, because
+// bcrypt ignores anything past 72 bytes.
 const password = z
   .string()
   .min(8, "Password must be at least 8 characters.")
@@ -73,12 +57,10 @@ export const receptionistCreateSchema = z.object({
 });
 
 /*
-  The update schemas deliberately differ from their Pydantic counterparts.
-
-  DoctorUpdate and ReceptionistUpdate allow every field to be None, because
-  the endpoint accepts a partial patch. The edit form is not partial — it
-  shows both fields already filled in and always submits both — so leaving
-  one blank is a mistake to catch here, not a patch to send.
+  The update schemas require what their Pydantic counterparts allow to be
+  None. The endpoints accept a partial patch, but the edit form is not
+  partial: it shows both fields filled in and always submits both, so a
+  blank one is a mistake to catch rather than a patch to send.
 */
 export const doctorUpdateSchema = z.object({
   full_name: fullName,

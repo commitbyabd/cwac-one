@@ -3,16 +3,12 @@ import LoginForm from "./LoginForm.jsx";
 import SecurityNote from "./SecurityNote.jsx";
 
 /*
-  Layout only.
-  Every visual piece lives in its own file — this component just
-  arranges them and owns the spacing between them.
+  Layout only. Every visual piece lives in its own file; this arranges them
+  and owns the spacing between them.
 
-  Vertical rhythm (per spec):
-    heading → description 8px  (inside SignupHeading)
-    description → form   32px  (mt-8)
-    field → field        22px  (inside LoginForm)
-    password → button    20px  (inside LoginForm)
-    button → security    28px  (mt-7)
+  Vertical rhythm per spec:
+    description -> form   32px (mt-8)
+    button -> security    28px (mt-7)
 */
 function SignupMain() {
   return (

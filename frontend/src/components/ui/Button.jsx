@@ -1,9 +1,7 @@
 /*
-  The one button in the system. Never restyle a button per page —
-  add a variant here instead.
+  The one button in the system. Add a variant here rather than restyling a
+  button per page.
 
-  variant: primary | plum | outline | danger
-  size:    sm | md | lg
   fullWidth pushes the label left and any trailingIcon right.
 */
 const VARIANTS = {
@@ -12,8 +10,7 @@ const VARIANTS = {
   plum: "bg-plum text-white shadow-button hover:-translate-y-px hover:bg-plum-deep focus-visible:ring-violet/22",
   outline:
     "border border-border bg-white text-plum shadow-sm hover:-translate-y-px hover:bg-pale-lavender focus-visible:ring-violet/22",
-  danger:
-    "text-error hover:bg-error-bg focus-visible:ring-error/30",
+  danger: "text-error hover:bg-error-bg focus-visible:ring-error/30",
 };
 
 const SIZES = {

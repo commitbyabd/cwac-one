@@ -119,13 +119,11 @@
   --color-error-bg: #fcecef;
 
   /*
-    Calm guidance, for a field checked on blur before anything was
-    submitted. Deliberately the brand violet rather than a red: nothing has
-    gone wrong yet, the form is just answering a question early.
+    Field guidance shown on blur, before anything is submitted. Violet
+    rather than red because nothing has gone wrong yet.
 
-    It borrows violet-hover, not violet, purely for legibility — plain
-    violet sits at about 4.2:1 against porcelain, under the 4.5:1 needed
-    for body text, while this clears it at roughly 5.2:1.
+    Borrows violet-hover for legibility: plain violet sits at ~4.2:1
+    against porcelain, under the 4.5:1 needed for body text.
   */
   --color-hint: var(--color-violet-hover);
 
@@ -159,14 +157,13 @@
 
   /* =========================
      Animation  →  animate-selected-pulse
-     A slow halo breathing outwards from the selected staff card.
+     Halo breathing outwards from the selected staff card.
 
-     It animates `outline`, not `box-shadow` or `ring`, on purpose: both of
-     those compile to box-shadow in Tailwind, so a keyframe touching them
-     would wipe out the card's own drop shadow for the whole cycle.
-     `outline` is a separate property and stacks cleanly on top.
+     Animates `outline` rather than `box-shadow` or `ring`: both of those
+     compile to box-shadow in Tailwind, so a keyframe touching them would
+     wipe out the card's drop shadow for the whole cycle.
 
-     Keyframes live inside @theme so Tailwind emits them together with the
+     Keyframes sit inside @theme so Tailwind emits them alongside the
      utility that references them.
   ========================= */
   --animate-selected-pulse: selected-pulse 1.8s ease-in-out infinite;

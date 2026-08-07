@@ -1,7 +1,5 @@
-/*
-  Generic pill badge with an optional leading status dot.
-  Colours come from the caller: <Badge className="bg-seafoam text-plum" />
-*/
+// Pill badge with an optional leading dot. Colours come from the caller:
+// <Badge className="bg-seafoam text-plum" />
 function Badge({ children, dot = true, dotClassName = "bg-plum", className = "" }) {
   return (
     <span

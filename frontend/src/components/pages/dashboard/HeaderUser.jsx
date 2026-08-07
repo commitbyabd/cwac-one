@@ -2,25 +2,22 @@ import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { readUser, clearSession } from "../../../api/auth.js";
 
-// "admin" -> "Admin". The API stores roles lowercase; the header shows them
-// the way a person would write them.
+// Roles are stored lowercase; the header shows them the way a person
+// would write them.
 const titleCase = (value) =>
   value ? value.charAt(0).toUpperCase() + value.slice(1) : "";
 
 function HeaderUser() {
   const navigate = useNavigate();
 
-  /*
-    Read straight from storage rather than through props, so the header does
-    not depend on every page remembering to pass the session down.
-  */
+  // Read from storage rather than props, so the header does not depend on
+  // every page passing the session down.
   const user = readUser();
   const name = user?.full_name || "Signed in";
   const role = titleCase(user?.role) || "Staff";
 
   const handleSignOut = () => {
     clearSession();
-    // replace, so Back cannot return to a screen the user just left
     navigate("/signup", { replace: true });
   };
 

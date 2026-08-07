@@ -1,12 +1,9 @@
 import { Pencil, Ban } from "lucide-react";
 import Button from "../../ui/Button.jsx";
 
-/*
-  The per-row actions. Both buttons only open a dialog — the request itself
-  belongs to whoever owns the list, since that is what has to refresh
-  afterwards.
-*/
-function DoctorActions({ name, onEdit, onDeactivate }) {
+// Both buttons only open a dialog. The request belongs to whoever owns the
+// list, since that is what has to refresh afterwards.
+function StaffActions({ name, onEdit, onDeactivate }) {
   return (
     <div className="flex shrink-0 items-center gap-2">
       <Button
@@ -32,4 +29,4 @@ function DoctorActions({ name, onEdit, onDeactivate }) {
   );
 }
 
-export default DoctorActions;
+export default StaffActions;

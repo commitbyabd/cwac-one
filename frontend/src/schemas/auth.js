@@ -3,14 +3,11 @@ import { z } from "zod";
 /*
   Mirrors UserLogin in app/schemas/user_login.py.
 
-  Note what is missing: no length rule on the password. UserLogin declares
-  SecretStr with no min_length, and that is correct — an account created
-  before the rules tightened must still be able to sign in. Enforcing the
-  create-time minimum here would lock those accounts out of their own
-  dashboard while the server was perfectly willing to let them in.
+  No length rule on the password, matching the server: an account created
+  before the create-time minimum existed must still be able to sign in.
 */
 export const userLoginSchema = z.object({
-  // Trimmed before the format check, not after — see the note in staff.js.
+  // Trimmed before the format check. See the note in staff.js.
   email: z
     .string()
     .trim()

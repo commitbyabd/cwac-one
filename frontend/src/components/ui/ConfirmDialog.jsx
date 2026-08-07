@@ -2,13 +2,9 @@ import Modal from "./Modal.jsx";
 import Button from "./Button.jsx";
 import Alert from "./Alert.jsx";
 
-/*
-  Yes/no prompt for an action worth pausing on.
-
-  The parent owns the request, so it also owns 'busy' and 'error' — the
-  dialog stays open while the call is in flight and shows the failure in
-  place rather than closing and losing the user's context.
-*/
+// Yes/no prompt. The parent owns the request, so it owns busy and error
+// too: the dialog stays open while the call is in flight and reports a
+// failure in place rather than closing and losing the context.
 function ConfirmDialog({
   title,
   message,

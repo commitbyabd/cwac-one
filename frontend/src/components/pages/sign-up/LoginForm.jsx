@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import EmailField from "./EmailField.jsx";
-import PasswordField from "./PasswordField.jsx";
+import PasswordField from "../../ui/PasswordField.jsx";
 import Button from "../../ui/Button.jsx";
 import IconBox from "../../ui/IconBox.jsx";
 import Alert from "../../ui/Alert.jsx";
@@ -10,10 +10,7 @@ import { login, saveToken, saveUser, readApiError } from "../../../api/auth.js";
 import { userLoginSchema } from "../../../schemas/auth.js";
 import { validateField, validateWith } from "../../../schemas/validate.js";
 
-/*
-  Owns the form state and the POST /login call.
-  SignupMain stays layout-only.
-*/
+// Owns the form state and the sign-in call; SignupMain stays layout only.
 function LoginForm() {
   const navigate = useNavigate();
   const [values, setValues] = useState({ email: "", password: "" });
@@ -21,8 +18,7 @@ function LoginForm() {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Calm guidance while they are still typing, red once they have tried to
-  // sign in and something stopped them.
+  // Calm guidance while typing, red once a sign-in attempt has failed.
   const [submitted, setSubmitted] = useState(false);
   const tone = submitted ? "error" : "hint";
 
@@ -45,11 +41,12 @@ function LoginForm() {
     setFormError("");
     setSubmitted(true);
 
-    // Rules in src/schemas/auth.js, mirroring UserLogin on the server.
-    const { valid, data: credentials, errors } = validateWith(
-      userLoginSchema,
-      values,
-    );
+    const {
+      valid,
+      data: credentials,
+      errors,
+    } = validateWith(userLoginSchema, values);
+
     setFieldErrors(errors);
     if (!valid) return;
 

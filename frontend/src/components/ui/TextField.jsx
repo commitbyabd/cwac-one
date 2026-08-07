@@ -1,13 +1,11 @@
 /*
-  Generic labelled input.
-  - icon      → node pinned inside the left edge
-  - trailing  → node pinned inside the right edge (e.g. a toggle button)
-  - error     → inline validation text rendered beneath the field
-  - tone      → how loudly to say it: "hint" while the user is still
-                filling the form in, "error" once they have tried to submit
+  Labelled input.
 
-  The ring is driven by has-[input:focus] rather than focus-within so a
-  focused trailing button lights up on its own, not the whole field.
+  icon      node pinned inside the left edge
+  trailing  node pinned inside the right edge, e.g. a visibility toggle
+  error     message rendered beneath the field
+  tone      how loudly to say it: "hint" while the form is being filled in,
+            "error" once submit has been attempted
 */
 const TONES = {
   hint: "text-hint",
@@ -33,6 +31,8 @@ function TextField({
         {label}
       </label>
 
+      {/* has-[input:focus] rather than focus-within, so a focused trailing
+          button lights up on its own instead of the whole field */}
       <div className="relative mt-2 flex h-(--input-height) items-center rounded-md border border-border bg-input-surface transition duration-200 has-[input:focus]:border-violet has-[input:focus]:shadow-input-focus">
         {icon && <span className="absolute left-3 flex">{icon}</span>}
 
