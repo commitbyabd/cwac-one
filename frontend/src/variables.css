@@ -145,6 +145,32 @@
   ========================= */
   --blur-card: 18px;
   --blur-glass: 12px;
+
+  /* =========================
+     Animation  →  animate-selected-pulse
+     A slow halo breathing outwards from the selected staff card.
+
+     It animates `outline`, not `box-shadow` or `ring`, on purpose: both of
+     those compile to box-shadow in Tailwind, so a keyframe touching them
+     would wipe out the card's own drop shadow for the whole cycle.
+     `outline` is a separate property and stacks cleanly on top.
+
+     Keyframes live inside @theme so Tailwind emits them together with the
+     utility that references them.
+  ========================= */
+  --animate-selected-pulse: selected-pulse 1.8s ease-in-out infinite;
+
+  @keyframes selected-pulse {
+    0%,
+    100% {
+      outline-color: var(--coral-60);
+      outline-offset: 0px;
+    }
+    50% {
+      outline-color: transparent;
+      outline-offset: 10px;
+    }
+  }
 }
 
 :root {
@@ -200,6 +226,7 @@
   --violet-24: rgba(120, 103, 242, 0.24);
   --violet-22: rgba(120, 103, 242, 0.22);
   --violet-16: rgba(120, 103, 242, 0.16);
+  --coral-60: rgba(255, 122, 112, 0.6);
   --coral-34: rgba(255, 122, 112, 0.34);
   --coral-15: rgba(255, 122, 112, 0.15);
   --seafoam-65: rgba(184, 242, 229, 0.65);

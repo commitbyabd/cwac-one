@@ -5,28 +5,54 @@ import Button from "../../ui/Button.jsx";
 import Alert from "../../ui/Alert.jsx";
 import TextField from "../../ui/TextField.jsx";
 import IconBox from "../../ui/IconBox.jsx";
-import { updateDoctor, updateReceptionist } from "../../../api/admin.js";
+import PasswordField from "../sign-up/PasswordField.jsx";
+import {
+  createDoctor,
+  createReceptionist,
+  updateDoctor,
+  updateReceptionist,
+} from "../../../api/admin.js";
 import { readApiError } from "../../../api/auth.js";
+import {
+  doctorCreateSchema,
+  doctorUpdateSchema,
+  receptionistCreateSchema,
+  receptionistUpdateSchema,
+} from "../../../schemas/staff.js";
+import { validateWith } from "../../../schemas/validate.js";
 
 /*
-  Edit form for one staff member, shown as a dialog.
+  One dialog for adding and editing staff.
 
-  Doctors and receptionists differ by exactly one field, so they share this
-  component rather than duplicating a form. 'kind' decides whether
-  specialization is asked for and which endpoint the save goes to.
+  Two axes, four combinations, no duplication:
+    - 'kind'  decides doctor or receptionist — which endpoint is called and
+      whether specialization is asked for.
+    - 'staff' decides add or edit — pass a record to edit it, pass nothing
+      to create a new one.
 
-  The rules below mirror DoctorUpdate / ReceptionistUpdate on the server —
-  checked here only to spare the user a round trip. The server still
+  The rules live in src/schemas/staff.js, which mirrors the Pydantic models.
+  They are checked here only to spare the user a round trip; the server still
   validates, and a rejection surfaces through readApiError.
 */
-function StaffFormModal({ staff, kind, onClose, onSaved }) {
+const SCHEMAS = {
+  doctor: { create: doctorCreateSchema, update: doctorUpdateSchema },
+  receptionist: {
+    create: receptionistCreateSchema,
+    update: receptionistUpdateSchema,
+  },
+};
+
+function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
   const isDoctor = kind === "doctor";
+  const isCreate = staff === null;
   const noun = isDoctor ? "doctor" : "receptionist";
+  const mode = isCreate ? "add" : "edit";
 
   const [values, setValues] = useState({
-    full_name: staff.full_name ?? "",
-    email: staff.email ?? "",
-    specialization: staff.specialization ?? "",
+    full_name: staff?.full_name ?? "",
+    email: staff?.email ?? "",
+    specialization: staff?.specialization ?? "",
+    password: "",
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -38,43 +64,46 @@ function StaffFormModal({ staff, kind, onClose, onSaved }) {
     setFieldErrors((current) => ({ ...current, [name]: "" }));
   };
 
-  const validate = () => {
-    const errors = {};
-
-    if (values.full_name.trim().length < 2) {
-      errors.full_name = "Full name must be at least 2 characters.";
-    }
-    if (!values.email.trim()) {
-      errors.email = "Email address is required.";
-    }
-    if (isDoctor && values.specialization.trim().length < 2) {
-      errors.specialization = "Specialization must be at least 2 characters.";
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormError("");
-    if (!validate()) return;
 
-    const payload = {
-      full_name: values.full_name.trim(),
-      email: values.email.trim(),
-    };
-    if (isDoctor) payload.specialization = values.specialization.trim();
+    const schema = SCHEMAS[isDoctor ? "doctor" : "receptionist"][
+      isCreate ? "create" : "update"
+    ];
+
+    /*
+      The parsed data is the payload. The schema has already trimmed what
+      should be trimmed and dropped every key it does not declare — so a
+      receptionist loses 'specialization' and an edit loses 'password'
+      without this function knowing either rule.
+    */
+    const { valid, data: payload, errors } = validateWith(schema, values);
+    setFieldErrors(errors);
+    if (!valid) return;
 
     setSaving(true);
     try {
-      const envelope = isDoctor
-        ? await updateDoctor(staff.id, payload)
-        : await updateReceptionist(staff.id, payload);
+      let envelope;
 
-      // The parent refetches; it owns the list, not this dialog.
-      onSaved(envelope.message);
+      if (isCreate) {
+        envelope = isDoctor
+          ? await createDoctor(payload)
+          : await createReceptionist(payload);
+      } else {
+        envelope = isDoctor
+          ? await updateDoctor(staff.id, payload)
+          : await updateReceptionist(staff.id, payload);
+      }
+
+      /*
+        The parent refetches; it owns the list, not this dialog. The payload
+        goes back with the message because the name in it is the new one —
+        the parent's copy of the record still holds the name before the edit.
+      */
+      onSaved(envelope.message, payload);
     } catch (error) {
+      // A duplicate email lands here as a 409 with a readable message.
       setFormError(readApiError(error));
       setSaving(false);
     }
@@ -82,8 +111,12 @@ function StaffFormModal({ staff, kind, onClose, onSaved }) {
 
   return (
     <Modal
-      title={`Edit ${noun}`}
-      subtitle={staff.full_name}
+      title={`${isCreate ? "Add" : "Edit"} ${noun}`}
+      subtitle={
+        isCreate
+          ? "They can sign in with these details straight away."
+          : staff.full_name
+      }
       onClose={onClose}
     >
       <form onSubmit={handleSubmit} noValidate>
@@ -91,10 +124,10 @@ function StaffFormModal({ staff, kind, onClose, onSaved }) {
 
         <div className="space-y-5">
           <TextField
-            id="edit-full-name"
+            id={`${mode}-full-name`}
             name="full_name"
             label="Full name"
-            placeholder="Dr. Sara Khan"
+            placeholder={isDoctor ? "Dr. Sara Khan" : "Sara Khan"}
             value={values.full_name}
             onChange={handleChange}
             error={fieldErrors.full_name}
@@ -107,7 +140,7 @@ function StaffFormModal({ staff, kind, onClose, onSaved }) {
           />
 
           <TextField
-            id="edit-email"
+            id={`${mode}-email`}
             name="email"
             type="email"
             label="Email address"
@@ -126,7 +159,7 @@ function StaffFormModal({ staff, kind, onClose, onSaved }) {
 
           {isDoctor && (
             <TextField
-              id="edit-specialization"
+              id={`${mode}-specialization`}
               name="specialization"
               label="Specialization"
               placeholder="Dermatology"
@@ -139,6 +172,19 @@ function StaffFormModal({ staff, kind, onClose, onSaved }) {
                   <Stethoscope className="size-4 text-violet" strokeWidth={2} />
                 </IconBox>
               }
+            />
+          )}
+
+          {isCreate && (
+            <PasswordField
+              id={`${mode}-password`}
+              label="Temporary password"
+              placeholder="At least 8 characters"
+              autoComplete="new-password"
+              value={values.password}
+              onChange={handleChange}
+              error={fieldErrors.password}
+              disabled={saving}
             />
           )}
         </div>
@@ -154,7 +200,13 @@ function StaffFormModal({ staff, kind, onClose, onSaved }) {
             disabled={saving}
             className="disabled:pointer-events-none disabled:opacity-70"
           >
-            {saving ? "Saving…" : "Save changes"}
+            {isCreate
+              ? saving
+                ? "Adding…"
+                : `Add ${noun}`
+              : saving
+                ? "Saving…"
+                : "Save changes"}
           </Button>
         </div>
       </form>

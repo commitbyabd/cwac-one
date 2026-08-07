@@ -7,6 +7,8 @@ import Button from "../../ui/Button.jsx";
 import IconBox from "../../ui/IconBox.jsx";
 import Alert from "../../ui/Alert.jsx";
 import { login, saveToken, saveUser, readApiError } from "../../../api/auth.js";
+import { userLoginSchema } from "../../../schemas/auth.js";
+import { validateWith } from "../../../schemas/validate.js";
 
 /*
   Owns the form state and the POST /login call.
@@ -25,22 +27,21 @@ function LoginForm() {
     setFieldErrors((current) => ({ ...current, [name]: "" }));
   };
 
-  const validate = () => {
-    const errors = {};
-    if (!values.email.trim()) errors.email = "Email address is required.";
-    if (!values.password) errors.password = "Password is required.";
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormError("");
-    if (!validate()) return;
+
+    // Rules in src/schemas/auth.js, mirroring UserLogin on the server.
+    const { valid, data: credentials, errors } = validateWith(
+      userLoginSchema,
+      values,
+    );
+    setFieldErrors(errors);
+    if (!valid) return;
 
     setSubmitting(true);
     try {
-      const data = await login(values);
+      const data = await login(credentials);
       const token = data?.access_token ?? data?.token;
       if (token) saveToken(token);
 

@@ -1,4 +1,3 @@
-import StaffBadge from "./StaffBadge.jsx";
 import SignupHeading from "./SignupHeading.jsx";
 import LoginForm from "./LoginForm.jsx";
 import SecurityNote from "./SecurityNote.jsx";
@@ -9,7 +8,6 @@ import SecurityNote from "./SecurityNote.jsx";
   arranges them and owns the spacing between them.
 
   Vertical rhythm (per spec):
-    badge → heading      24px  (mt-6)
     heading → description 8px  (inside SignupHeading)
     description → form   32px  (mt-8)
     field → field        22px  (inside LoginForm)
@@ -20,11 +18,7 @@ function SignupMain() {
   return (
     <main className="grid min-h-screen place-items-center bg-(image:--gradient-page) px-4 py-10 sm:px-6">
       <section className="w-full max-w-(--login-card-width) rounded-xl border border-white/75 bg-porcelain/88 p-6 shadow-card backdrop-blur-card sm:p-10">
-        <StaffBadge />
-
-        <div className="mt-6">
-          <SignupHeading />
-        </div>
+        <SignupHeading />
 
         <div className="mt-8">
           <LoginForm />

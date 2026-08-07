@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import DashboardHeader from "./DashboardHeader.jsx";
 import ManagePanel from "./ManagePanel.jsx";
 import SectionHeader from "./SectionHeader.jsx";
@@ -6,6 +7,8 @@ import DoctorCard from "./DoctorCard.jsx";
 import StaffFormModal from "./StaffFormModal.jsx";
 import ConfirmDialog from "../../ui/ConfirmDialog.jsx";
 import Alert from "../../ui/Alert.jsx";
+import Button from "../../ui/Button.jsx";
+import Toast from "../../ui/Toast.jsx";
 import {
   listDoctors,
   listReceptionists,
@@ -61,10 +64,28 @@ function DashboardMain() {
   */
   const [reloadToken, setReloadToken] = useState(0);
 
+  /*
+    'editing' holds the record being edited; 'creating' is a plain flag
+    because a new record has nothing to hold yet. Both feed the same
+    dialog — StaffFormModal treats a missing record as "add".
+  */
   const [editing, setEditing] = useState(null);
+  const [creating, setCreating] = useState(false);
   const [confirming, setConfirming] = useState(null);
   const [confirmBusy, setConfirmBusy] = useState(false);
   const [confirmError, setConfirmError] = useState("");
+
+  /*
+    The id exists only to give the toast a fresh React key. Two identical
+    messages in a row would otherwise reuse the same element, and the
+    second one would inherit whatever was left of the first one's timer.
+  */
+  const [toast, setToast] = useState(null);
+  const showToast = (message) => setToast({ id: Date.now(), message });
+
+  // Which card is highlighted. Stored as an id rather than the record, so a
+  // refetch cannot leave a stale copy of a row selected.
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     // "Deactivated users" has no endpoint yet, so there is nothing to load.
@@ -125,9 +146,14 @@ function DashboardMain() {
     setConfirmBusy(true);
     setConfirmError("");
 
+    // Held onto now, because the dialog is closed before the toast is shown
+    // and 'confirming' is null by then.
+    const target = confirming;
+
     try {
-      await view.deactivate(confirming.id);
+      await view.deactivate(target.id);
       setConfirming(null);
+      showToast(`${target.full_name} was deactivated successfully.`);
       refresh();
     } catch (requestError) {
       // Kept open so the message lands where the user is looking.
@@ -153,13 +179,33 @@ function DashboardMain() {
         <DashboardHeader />
 
         <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <ManagePanel activeTitle={activeTitle} onSelect={setActiveTitle} />
+          <ManagePanel
+            activeTitle={activeTitle}
+            onSelect={(title) => {
+              setActiveTitle(title);
+              // A selection belongs to the list it was made in.
+              setSelectedId(null);
+            }}
+          />
 
           <section className="min-w-0">
             <SectionHeader
               title={activeTitle}
               subtitle={view?.subtitle ?? "Accounts without access"}
               count={view ? count : ""}
+              action={
+                view && (
+                  <Button
+                    variant="primary"
+                    leadingIcon={
+                      <Plus className="size-4.5" strokeWidth={2.25} />
+                    }
+                    onClick={() => setCreating(true)}
+                  >
+                    Add {view.noun}
+                  </Button>
+                )
+              }
             />
 
             <div className="mt-5 space-y-4">
@@ -199,6 +245,14 @@ function DashboardMain() {
                     specialty={member.specialization}
                     role={view.kind === "doctor" ? "Doctor" : "Receptionist"}
                     email={member.email}
+                    selected={member.id === selectedId}
+                    // Clicking the highlighted card again clears it, so a
+                    // selection is never something you are stuck with.
+                    onSelect={() =>
+                      setSelectedId((current) =>
+                        current === member.id ? null : member.id,
+                      )
+                    }
                     onEdit={() => setEditing(member)}
                     onDeactivate={() => setConfirming(member)}
                   />
@@ -208,13 +262,29 @@ function DashboardMain() {
         </div>
       </div>
 
+      {creating && view && (
+        <StaffFormModal
+          kind={view.kind}
+          onClose={() => setCreating(false)}
+          onSaved={(message) => {
+            setCreating(false);
+            // The server's own wording, so the confirmation matches what
+            // actually happened rather than what the UI assumed.
+            showToast(message || `The ${view.noun} was added successfully.`);
+            refresh();
+          }}
+        />
+      )}
+
       {editing && (
         <StaffFormModal
           staff={editing}
           kind={view.kind}
           onClose={() => setEditing(null)}
-          onSaved={() => {
+          onSaved={(message, saved) => {
             setEditing(null);
+            // The name they just typed, not the one the list still holds.
+            showToast(`${saved.full_name}'s fields updated successfully.`);
             refresh();
           }}
         />
@@ -229,6 +299,14 @@ function DashboardMain() {
           error={confirmError}
           onConfirm={handleDeactivate}
           onClose={closeConfirm}
+        />
+      )}
+
+      {toast && (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          onDone={() => setToast(null)}
         />
       )}
     </div>
