@@ -5,11 +5,11 @@ from app.db_functions.auth import get_user_by_email
 from logging_config import logger
 
 
-async def edit_receptionist(
-    receptionist_id: str,
-    full_name: str | None = None,
-    email: str | None = None,
-):
+async def edit_receptionist(payload: dict):
+    receptionist_id = payload.get("receptionist_id")
+    full_name = payload.get("full_name")
+    email = payload.get("email")
+
     try:
         # malformed id, treat the same as "not found"
         if not ObjectId.is_valid(receptionist_id):

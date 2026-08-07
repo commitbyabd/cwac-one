@@ -5,7 +5,12 @@ from app.db_functions.auth import get_user_by_email
 from logging_config import logger
 
 
-async def add_receptionist(full_name: str, email: str, password: str):
+async def add_receptionist(payload: dict):
+    full_name = payload.get("full_name")
+    email = payload.get("email")
+    # the schema wraps the password in SecretStr so it stays masked in logs
+    password = payload.get("password").get_secret_value()
+
     try:
         if await get_user_by_email(email):
             return api_response(

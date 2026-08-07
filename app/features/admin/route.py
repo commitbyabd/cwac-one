@@ -46,12 +46,7 @@ async def reactivate_doctor(doctor_id: str, _: dict = Depends(require_role("admi
 
 @router.post("/doctors")
 async def add_doctor(doctor: DoctorCreate, _: dict = Depends(require_role("admin"))):
-    return await add_doctor_api(
-        doctor.full_name,
-        doctor.email,
-        doctor.password.get_secret_value(),
-        doctor.specialization,
-    )
+    return await add_doctor_api(doctor.model_dump())
 
 
 @router.patch("/doctors/{doctor_id}")
@@ -60,12 +55,7 @@ async def edit_doctor(
     doctor: DoctorUpdate,
     _: dict = Depends(require_role("admin")),
 ):
-    return await edit_doctor_api(
-        doctor_id,
-        doctor.full_name,
-        doctor.email,
-        doctor.specialization,
-    )
+    return await edit_doctor_api({"doctor_id": doctor_id, **doctor.model_dump()})
 
 
 # -------------------------------------------------------------------------------------
@@ -103,11 +93,7 @@ async def reactivate_receptionist(
 async def add_receptionist(
     receptionist: ReceptionistCreate, _: dict = Depends(require_role("admin"))
 ):
-    return await add_receptionist_api(
-        receptionist.full_name,
-        receptionist.email,
-        receptionist.password.get_secret_value(),
-    )
+    return await add_receptionist_api(receptionist.model_dump())
 
 
 @router.patch("/receptionists/{receptionist_id}")
@@ -117,7 +103,5 @@ async def edit_receptionist(
     _: dict = Depends(require_role("admin")),
 ):
     return await edit_receptionist_api(
-        receptionist_id,
-        receptionist.full_name,
-        receptionist.email,
+        {"receptionist_id": receptionist_id, **receptionist.model_dump()}
     )

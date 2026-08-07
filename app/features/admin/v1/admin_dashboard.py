@@ -25,23 +25,16 @@ async def deactivate_doctor_api(doctor_id: str):
     return await set_doctor_state(doctor_id, is_active=False)
 
 
-async def edit_doctor_api(
-    doctor_id: str,
-    full_name: str | None = None,
-    email: str | None = None,
-    specialization: str | None = None,
-):
-    return await edit_doctor(doctor_id, full_name, email, specialization)
+async def edit_doctor_api(payload: dict):
+    return await edit_doctor(payload)
 
 
 async def reactivate_doctor_api(doctor_id: str):
     return await set_doctor_state(doctor_id, is_active=True)
 
 
-async def add_doctor_api(
-    full_name: str, email: str, password: str, specialization: str
-):
-    return await add_doctor(full_name, email, password, specialization)
+async def add_doctor_api(payload: dict):
+    return await add_doctor(payload)
 
 
 # -------------------------------------------------------------------------------------
@@ -65,13 +58,9 @@ async def reactivate_receptionist_api(receptionist_id: str):
     return await set_receptionist_state(receptionist_id, is_active=True)
 
 
-async def add_receptionist_api(full_name: str, email: str, password: str):
-    return await add_receptionist(full_name, email, password)
+async def add_receptionist_api(payload: dict):
+    return await add_receptionist(payload)
 
 
-async def edit_receptionist_api(
-    receptionist_id: str,
-    full_name: str | None = None,
-    email: str | None = None,
-):
-    return await edit_receptionist(receptionist_id, full_name, email)
+async def edit_receptionist_api(payload: dict):
+    return await edit_receptionist(payload)

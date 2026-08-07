@@ -5,12 +5,12 @@ from app.db_functions.auth import get_user_by_email
 from logging_config import logger
 
 
-async def edit_doctor(
-    doctor_id: str,
-    full_name: str | None = None,
-    email: str | None = None,
-    specialization: str | None = None,
-):
+async def edit_doctor(payload: dict):
+    doctor_id = payload.get("doctor_id")
+    full_name = payload.get("full_name")
+    email = payload.get("email")
+    specialization = payload.get("specialization")
+
     try:
         # malformed id, treat the same as "not found"
         if not ObjectId.is_valid(doctor_id):
