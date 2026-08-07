@@ -3,11 +3,27 @@
   - icon      → node pinned inside the left edge
   - trailing  → node pinned inside the right edge (e.g. a toggle button)
   - error     → inline validation text rendered beneath the field
+  - tone      → how loudly to say it: "hint" while the user is still
+                filling the form in, "error" once they have tried to submit
 
   The ring is driven by has-[input:focus] rather than focus-within so a
   focused trailing button lights up on its own, not the whole field.
 */
-function TextField({ id, label, icon, trailing, error, className = "", ...inputProps }) {
+const TONES = {
+  hint: "text-hint",
+  error: "text-error",
+};
+
+function TextField({
+  id,
+  label,
+  icon,
+  trailing,
+  error,
+  tone = "error",
+  className = "",
+  ...inputProps
+}) {
   return (
     <div className={className}>
       <label
@@ -32,7 +48,10 @@ function TextField({ id, label, icon, trailing, error, className = "", ...inputP
       </div>
 
       {error && (
-        <p id={`${id}-error`} className="mt-2 font-primary text-sm text-error">
+        <p
+          id={`${id}-error`}
+          className={`mt-2 font-primary text-sm ${TONES[tone] ?? TONES.error}`}
+        >
           {error}
         </p>
       )}

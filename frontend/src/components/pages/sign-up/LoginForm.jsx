@@ -8,7 +8,7 @@ import IconBox from "../../ui/IconBox.jsx";
 import Alert from "../../ui/Alert.jsx";
 import { login, saveToken, saveUser, readApiError } from "../../../api/auth.js";
 import { userLoginSchema } from "../../../schemas/auth.js";
-import { validateWith } from "../../../schemas/validate.js";
+import { validateField, validateWith } from "../../../schemas/validate.js";
 
 /*
   Owns the form state and the POST /login call.
@@ -21,15 +21,29 @@ function LoginForm() {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Calm guidance while they are still typing, red once they have tried to
+  // sign in and something stopped them.
+  const [submitted, setSubmitted] = useState(false);
+  const tone = submitted ? "error" : "hint";
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setValues((current) => ({ ...current, [name]: value }));
     setFieldErrors((current) => ({ ...current, [name]: "" }));
   };
 
+  const handleBlur = (event) => {
+    const { name, value } = event.target;
+    setFieldErrors((current) => ({
+      ...current,
+      [name]: validateField(userLoginSchema, name, value),
+    }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormError("");
+    setSubmitted(true);
 
     // Rules in src/schemas/auth.js, mirroring UserLogin on the server.
     const { valid, data: credentials, errors } = validateWith(
@@ -64,13 +78,17 @@ function LoginForm() {
         <EmailField
           value={values.email}
           onChange={handleChange}
+          onBlur={handleBlur}
           error={fieldErrors.email}
+          tone={tone}
           disabled={submitting}
         />
         <PasswordField
           value={values.password}
           onChange={handleChange}
+          onBlur={handleBlur}
           error={fieldErrors.password}
+          tone={tone}
           disabled={submitting}
         />
       </div>

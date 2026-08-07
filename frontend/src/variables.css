@@ -118,6 +118,17 @@
   --color-error: #c94f64;
   --color-error-bg: #fcecef;
 
+  /*
+    Calm guidance, for a field checked on blur before anything was
+    submitted. Deliberately the brand violet rather than a red: nothing has
+    gone wrong yet, the form is just answering a question early.
+
+    It borrows violet-hover, not violet, purely for legibility — plain
+    violet sits at about 4.2:1 against porcelain, under the 4.5:1 needed
+    for body text, while this clears it at roughly 5.2:1.
+  */
+  --color-hint: var(--color-violet-hover);
+
   /* =========================
      Radius  →  rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-pill
      The bare --radius became --radius-md; a bare name is not in the

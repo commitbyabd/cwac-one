@@ -19,7 +19,7 @@ import {
   receptionistCreateSchema,
   receptionistUpdateSchema,
 } from "../../../schemas/staff.js";
-import { validateWith } from "../../../schemas/validate.js";
+import { validateField, validateWith } from "../../../schemas/validate.js";
 
 /*
   One dialog for adding and editing staff.
@@ -48,6 +48,9 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
   const noun = isDoctor ? "doctor" : "receptionist";
   const mode = isCreate ? "add" : "edit";
 
+  const schema =
+    SCHEMAS[isDoctor ? "doctor" : "receptionist"][isCreate ? "create" : "update"];
+
   const [values, setValues] = useState({
     full_name: staff?.full_name ?? "",
     email: staff?.email ?? "",
@@ -58,19 +61,35 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
+  /*
+    How loudly to report a problem. Before the first submit the user is
+    still working, so a message is guidance and shows in the calm hint
+    colour. Once they have pressed the button, the same message is the
+    reason nothing happened, and red is the honest colour for that.
+  */
+  const [submitted, setSubmitted] = useState(false);
+  const tone = submitted ? "error" : "hint";
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setValues((current) => ({ ...current, [name]: value }));
     setFieldErrors((current) => ({ ...current, [name]: "" }));
   };
 
+  // Checked on the way out of a field, so a mistake is caught next to the
+  // input the user just left rather than at the bottom of the form later.
+  const handleBlur = (event) => {
+    const { name, value } = event.target;
+    setFieldErrors((current) => ({
+      ...current,
+      [name]: validateField(schema, name, value),
+    }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormError("");
-
-    const schema = SCHEMAS[isDoctor ? "doctor" : "receptionist"][
-      isCreate ? "create" : "update"
-    ];
+    setSubmitted(true);
 
     /*
       The parsed data is the payload. The schema has already trimmed what
@@ -130,7 +149,9 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
             placeholder={isDoctor ? "Dr. Sara Khan" : "Sara Khan"}
             value={values.full_name}
             onChange={handleChange}
+            onBlur={handleBlur}
             error={fieldErrors.full_name}
+            tone={tone}
             disabled={saving}
             icon={
               <IconBox className="bg-lavender">
@@ -148,7 +169,9 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
             autoComplete="email"
             value={values.email}
             onChange={handleChange}
+            onBlur={handleBlur}
             error={fieldErrors.email}
+            tone={tone}
             disabled={saving}
             icon={
               <IconBox className="bg-lavender">
@@ -165,7 +188,9 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
               placeholder="Dermatology"
               value={values.specialization}
               onChange={handleChange}
+              onBlur={handleBlur}
               error={fieldErrors.specialization}
+              tone={tone}
               disabled={saving}
               icon={
                 <IconBox className="bg-lavender">
@@ -183,7 +208,9 @@ function StaffFormModal({ staff = null, kind, onClose, onSaved }) {
               autoComplete="new-password"
               value={values.password}
               onChange={handleChange}
+              onBlur={handleBlur}
               error={fieldErrors.password}
+              tone={tone}
               disabled={saving}
             />
           )}

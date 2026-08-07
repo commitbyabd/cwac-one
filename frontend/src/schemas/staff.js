@@ -22,11 +22,22 @@ const fullName = z
   .min(2, "Full name must be at least 2 characters.")
   .max(100, "Full name cannot be longer than 100 characters.");
 
-// EmailStr = Field(..., max_length=254) — the RFC 5321 limit.
+/*
+  EmailStr = Field(..., max_length=254) — the RFC 5321 limit.
+
+  The trim has to happen in a separate step piped into the format check,
+  not chained after it. Zod runs checks in the order they are written, so
+  z.email().trim() would test " sara@clinic.com " for validity while the
+  spaces are still attached and reject a perfectly good pasted address.
+*/
 const email = z
-  .email("Enter a valid email address.")
+  .string()
   .trim()
-  .max(254, "Email address cannot be longer than 254 characters.");
+  .pipe(
+    z
+      .email("Enter a valid email address.")
+      .max(254, "Email address cannot be longer than 254 characters."),
+  );
 
 // Field(..., min_length=2, max_length=100)
 const specialization = z

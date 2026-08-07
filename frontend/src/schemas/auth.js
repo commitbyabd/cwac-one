@@ -10,9 +10,14 @@ import { z } from "zod";
   dashboard while the server was perfectly willing to let them in.
 */
 export const userLoginSchema = z.object({
+  // Trimmed before the format check, not after — see the note in staff.js.
   email: z
-    .email("Enter a valid email address.")
+    .string()
     .trim()
-    .max(254, "Email address cannot be longer than 254 characters."),
+    .pipe(
+      z
+        .email("Enter a valid email address.")
+        .max(254, "Email address cannot be longer than 254 characters."),
+    ),
   password: z.string().min(1, "Password is required."),
 });

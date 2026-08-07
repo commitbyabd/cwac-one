@@ -28,3 +28,22 @@ export function validateWith(schema, values) {
 
   return { valid: false, data: null, errors };
 }
+
+/*
+  Checks one field of an object schema, for validating as the user leaves an
+  input rather than waiting for submit.
+
+  z.object exposes its fields on .shape, so the field's own schema can be
+  pulled out and parsed alone. A name the schema does not declare returns no
+  message — that is not a failure, it just means the schema has no opinion
+  about that input, the way the update schemas have none about 'password'.
+
+  Returns the message, or an empty string when the field is fine.
+*/
+export function validateField(schema, name, value) {
+  const fieldSchema = schema.shape?.[name];
+  if (!fieldSchema) return "";
+
+  const result = fieldSchema.safeParse(value);
+  return result.success ? "" : result.error.issues[0].message;
+}
