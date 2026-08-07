@@ -20,7 +20,7 @@ function MessageScreen({
 }) {
   return (
     <main className="grid min-h-screen place-items-center bg-(image:--gradient-page) px-4 py-10">
-      <Card className="w-full max-w-[460px] bg-porcelain/88 p-8 text-center shadow-card backdrop-blur-card">
+      <Card className="w-full max-w-115 bg-porcelain/88 p-8 text-center shadow-card backdrop-blur-card">
         <div className="flex justify-center">
           <IconBox size="size-12" radius="rounded-lg" className={iconClassName}>
             {icon}

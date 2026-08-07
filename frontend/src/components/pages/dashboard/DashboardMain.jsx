@@ -103,7 +103,7 @@ function DashboardMain() {
       <div className="relative">
         <DashboardHeader />
 
-        <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="mx-auto grid max-w-310 grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
           <ManagePanel activeSlug={view?.slug} onSelect={selectView} />
 
           <section className="min-w-0">
