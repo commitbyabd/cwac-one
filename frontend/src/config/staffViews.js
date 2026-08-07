@@ -2,8 +2,11 @@ import { Stethoscope, ConciergeBell, UserX } from "lucide-react";
 import {
   listDoctors,
   listReceptionists,
+  listDeactivatedStaff,
   deactivateDoctor,
   deactivateReceptionist,
+  reactivateDoctor,
+  reactivateReceptionist,
 } from "../api/admin.js";
 
 /*
@@ -22,6 +25,7 @@ export const STAFF_VIEWS = [
     kind: "doctor",
     noun: "doctor",
     role: "Doctor",
+    empty: "No doctors yet. Add one to get started.",
     fetchList: listDoctors,
     deactivate: deactivateDoctor,
   },
@@ -33,6 +37,7 @@ export const STAFF_VIEWS = [
     kind: "receptionist",
     noun: "receptionist",
     role: "Receptionist",
+    empty: "No receptionists yet. Add one to get started.",
     fetchList: listReceptionists,
     deactivate: deactivateReceptionist,
   },
@@ -41,10 +46,16 @@ export const STAFF_VIEWS = [
     title: "Deactivated users",
     subtitle: "Accounts without access",
     icon: UserX,
-    // No endpoint lists deactivated staff yet, so this view has nothing to
-    // fetch. 'unavailable' is what the section renders instead.
-    unavailable:
-      "Deactivated staff cannot be listed yet. The API endpoint for this view has not been built.",
+    noun: "deactivated user",
+    empty: "No deactivated accounts. Everyone on staff currently has access.",
+    fetchList: listDeactivatedStaff,
+    // Restoring access is the only action here, and which endpoint to call
+    // depends on the row rather than the view: this list holds both roles.
+    // No 'kind', so the section knows not to offer an Add button.
+    reactivate: (member) =>
+      member.kind === "doctor"
+        ? reactivateDoctor(member.id)
+        : reactivateReceptionist(member.id),
   },
 ];
 

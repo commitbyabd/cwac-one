@@ -67,7 +67,11 @@ function DashboardMain() {
     setConfirmError("");
   };
 
-  const handleDeactivate = async () => {
+  // A view either takes access away or gives it back, never both, so one
+  // handler covers the dialog for every list.
+  const isRestore = Boolean(view?.reactivate);
+
+  const handleConfirm = async () => {
     setConfirmBusy(true);
     setConfirmError("");
 
@@ -76,9 +80,14 @@ function DashboardMain() {
     const target = confirming;
 
     try {
-      await view.deactivate(target.id);
+      // Reactivate takes the whole row: the endpoint depends on the role,
+      // which only the row knows in a mixed list.
+      await (isRestore ? view.reactivate(target) : view.deactivate(target.id));
+
       setConfirming(null);
-      showToast(`${target.full_name} was deactivated successfully.`);
+      showToast(
+        `${target.full_name} was ${isRestore ? "reactivated" : "deactivated"} successfully.`,
+      );
       refresh();
     } catch (error) {
       setConfirmError(readApiError(error));
@@ -88,6 +97,9 @@ function DashboardMain() {
   };
 
   const isList = Boolean(view?.fetchList);
+  // Only the role-specific lists can create: 'Add deactivated user' is not
+  // a thing an admin would ask for.
+  const canCreate = Boolean(view?.kind);
   const count =
     status === "loading"
       ? "Loading…"
@@ -112,7 +124,7 @@ function DashboardMain() {
               subtitle={view?.subtitle ?? ""}
               count={isList ? count : ""}
               action={
-                isList && (
+                canCreate && (
                   <Button
                     variant="primary"
                     leadingIcon={
@@ -127,12 +139,6 @@ function DashboardMain() {
             />
 
             <div className="mt-5 space-y-4">
-              {view?.unavailable && (
-                <p className="font-primary text-sm leading-body text-muted">
-                  {view.unavailable}
-                </p>
-              )}
-
               {isList && status === "error" && <Alert>{message}</Alert>}
 
               {isList && status === "loading" && (
@@ -142,9 +148,7 @@ function DashboardMain() {
               )}
 
               {isList && status === "ready" && total === 0 && (
-                <p className="font-primary text-sm text-muted">
-                  No {view.noun}s yet. Add one to get started.
-                </p>
+                <p className="font-primary text-sm text-muted">{view.empty}</p>
               )}
 
               {isList && status === "ready" && total > 0 && (
@@ -162,7 +166,9 @@ function DashboardMain() {
                         initials={initialsFrom(member.full_name)}
                         name={member.full_name}
                         specialty={member.specialization}
-                        role={view.role}
+                        // The deactivated list mixes roles, so its rows
+                        // carry their own.
+                        role={member.role ?? view.role}
                         email={member.email}
                         selected={member.id === selectedId}
                         onSelect={() =>
@@ -170,8 +176,15 @@ function DashboardMain() {
                             current === member.id ? null : member.id,
                           )
                         }
-                        onEdit={() => setEditing(member)}
-                        onDeactivate={() => setConfirming(member)}
+                        onEdit={
+                          isRestore ? undefined : () => setEditing(member)
+                        }
+                        onDeactivate={
+                          isRestore ? undefined : () => setConfirming(member)
+                        }
+                        onReactivate={
+                          isRestore ? () => setConfirming(member) : undefined
+                        }
                       />
                     ))}
                   </div>
@@ -219,12 +232,17 @@ function DashboardMain() {
 
       {confirming && isList && (
         <ConfirmDialog
-          title={`Deactivate ${view.noun}`}
-          message={`Are you sure you want to deactivate ${confirming.full_name}? They lose access immediately, but the record is kept and can be reactivated later.`}
-          confirmLabel="Deactivate"
+          title={isRestore ? "Reactivate account" : `Deactivate ${view.noun}`}
+          message={
+            isRestore
+              ? `Restore access for ${confirming.full_name}? They will be able to sign in again straight away.`
+              : `Are you sure you want to deactivate ${confirming.full_name}? They lose access immediately, but the record is kept and can be reactivated later.`
+          }
+          confirmLabel={isRestore ? "Reactivate" : "Deactivate"}
+          confirmVariant={isRestore ? "primary" : "danger"}
           busy={confirmBusy}
           error={confirmError}
-          onConfirm={handleDeactivate}
+          onConfirm={handleConfirm}
           onClose={closeConfirm}
         />
       )}

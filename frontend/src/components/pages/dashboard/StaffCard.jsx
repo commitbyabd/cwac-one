@@ -22,6 +22,7 @@ function StaffCard({
   onSelect,
   onEdit,
   onDeactivate,
+  onReactivate,
 }) {
   // Enter and Space are what a mouse click means for a keyboard. The target
   // check keeps a keypress on Edit or Deactivate from also toggling the row.
@@ -59,7 +60,12 @@ function StaffCard({
           />
         </div>
 
-        <StaffActions name={name} onEdit={onEdit} onDeactivate={onDeactivate} />
+        <StaffActions
+          name={name}
+          onEdit={onEdit}
+          onDeactivate={onDeactivate}
+          onReactivate={onReactivate}
+        />
       </div>
     </Card>
   );

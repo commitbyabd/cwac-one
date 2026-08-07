@@ -11,6 +11,7 @@ from .add_doctor import add_doctor
 from .add_receptionist import add_receptionist
 from .edit_doctor import edit_doctor
 from .edit_receptionist import edit_receptionist
+from .get_deactivated_users import get_deactivated_users
 
 
 async def doctor_list_api():
@@ -64,3 +65,12 @@ async def add_receptionist_api(payload: dict):
 
 async def edit_receptionist_api(payload: dict):
     return await edit_receptionist(payload)
+
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+
+
+async def get_deactivated_users_api():
+    return await get_deactivated_users()

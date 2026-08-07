@@ -63,3 +63,26 @@ export const deactivateReceptionist = (receptionistId) =>
 
 export const reactivateReceptionist = (receptionistId) =>
   unwrap(api.patch(`/admin/receptionists/${receptionistId}/reactivate`));
+
+/* ------------------------------------------------------------- deactivated */
+
+/*
+  One endpoint covers both roles, so the rows arrive mixed and each carries
+  its own 'role' straight from the users collection.
+
+  That raw value is kept as 'kind', since reactivating has to pick between
+  the doctor and receptionist endpoints, and 'role' is rewritten for display:
+  the card prints it as-is.
+*/
+export const listDeactivatedStaff = async () => {
+  const envelope = await unwrap(api.get("/admin/deactivated-users"));
+
+  return {
+    ...envelope,
+    data: (envelope.data ?? []).map((row) => ({
+      ...row,
+      kind: row.role,
+      role: row.role === "doctor" ? "Doctor" : "Receptionist",
+    })),
+  };
+};

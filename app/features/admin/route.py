@@ -15,6 +15,7 @@ from .v1.admin_dashboard import (
     add_receptionist_api,
     edit_doctor_api,
     edit_receptionist_api,
+    get_deactivated_users_api,
 )
 from app.schemas.doctor_create import DoctorCreate
 from app.schemas.doctor_update import DoctorUpdate
@@ -105,3 +106,13 @@ async def edit_receptionist(
     return await edit_receptionist_api(
         {"receptionist_id": receptionist_id, **receptionist.model_dump()}
     )
+
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+
+
+@router.get("/deactivated-users")
+async def deactivated_users(_: dict = Depends(require_role("admin"))):
+    return await get_deactivated_users_api()
