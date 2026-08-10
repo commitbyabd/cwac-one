@@ -11,12 +11,16 @@ async def edit_receptionist(payload: dict):
     email = payload.get("email")
 
     try:
-        # malformed id, treat the same as "not found"
-        if not ObjectId.is_valid(receptionist_id):
+        # malformed id: the client sent something that is not an ObjectId at
+        # all, which is a bad request rather than a missing record. The
+        # isinstance half also narrows the id to str for the query below.
+        if not isinstance(receptionist_id, str) or not ObjectId.is_valid(
+            receptionist_id
+        ):
             return api_response(
-                status_code=404,
-                message="Receptionist not found",
-                error_code="RECEPTIONIST_NOT_FOUND",
+                status_code=400,
+                message="Receptionist ID is not valid",
+                error_code="INVALID_RECEPTIONIST_ID",
                 data=None,
             )
 
@@ -49,6 +53,8 @@ async def edit_receptionist(payload: dict):
 
         updated = await edit_receptionist_query(receptionist_id, fields)
 
+        # the id was well formed, but it matches no receptionist — either
+        # nothing owns it, or the account it owns is not a receptionist
         if not updated:
             return api_response(
                 status_code=404,

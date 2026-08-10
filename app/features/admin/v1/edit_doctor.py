@@ -12,12 +12,14 @@ async def edit_doctor(payload: dict):
     specialization = payload.get("specialization")
 
     try:
-        # malformed id, treat the same as "not found"
-        if not ObjectId.is_valid(doctor_id):
+        # malformed id: the client sent something that is not an ObjectId at
+        # all, which is a bad request rather than a missing record. The
+        # isinstance half also narrows the id to str for the query below.
+        if not isinstance(doctor_id, str) or not ObjectId.is_valid(doctor_id):
             return api_response(
-                status_code=404,
-                message="Doctor not found",
-                error_code="DOCTOR_NOT_FOUND",
+                status_code=400,
+                message="Doctor ID is not valid",
+                error_code="INVALID_DOCTOR_ID",
                 data=None,
             )
 
@@ -53,6 +55,8 @@ async def edit_doctor(payload: dict):
 
         updated = await edit_doctor_query(doctor_id, fields)
 
+        # the id was well formed, but it matches no doctor — either nothing
+        # owns it, or the account it owns is not a doctor
         if not updated:
             return api_response(
                 status_code=404,
