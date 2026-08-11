@@ -6,6 +6,7 @@ from app.core.config import settings
 from app.core.database import connect_to_mongo, close_mongo_connection
 from app.routers.auth import router as auth_router
 from app.routers.admin import router as admin_router
+from app.routers.doctor import router as doctor_router
 
 
 @asynccontextmanager
@@ -36,3 +37,4 @@ async def read_root():
 
 app.include_router(auth_router)
 app.include_router(admin_router)
+app.include_router(doctor_router)
